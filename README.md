@@ -1,5 +1,5 @@
 # Private Placement Offering
-A traditional private placement offering involves filing a FORM D on the SEC.GOV EDGAR filing system, create a private placement memorandum and then search for qualified and accreditted investors. Prior to crytocurrency and blockchain, liquidity in the private equity markets were limited until the company initiated an IPO. Under rule 144, creates liquidity in a private equity offering after twelve months from each sale of restricted securities.
+A traditional private placement offering involves filing a FORM D on the SEC.GOV EDGAR filing system, create a private placement memorandum and then search for qualified and accreditted investors. Prior to crytocurrency and blockchain, liquidity in the private equity markets were limited until the company initiated an IPO. Under rule 144, creates liquidity in a private equity offering after twelve months from each sale of restricted securities. Using an cryptocurrency for the private equity offering on the Ethereum network can create compliance liquidity before an IPO as well as generate a market value.
 
 (THE FOLLOWING STATEMENTS ARE CLASSIFIED AS OPINIONS, SUBJECT TO VERIFICATION, etc. AND NOT LEGAL NOR INVESTMENT ADVICE!)
 
