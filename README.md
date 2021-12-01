@@ -144,7 +144,7 @@ The value of a company's stock as defined in the registration documents such as 
 The value of a company based on their accounting records (or books) taking into consideration sales, expenses, and assets. The book value should be greater than the total par value which is the product of the total shares and par value price.
 
 ## Market Value
-The value (price) of a company share that an investor will purchase shares of the company where the minimum price is determined by the par value. Also the most speculative pricing!
+The value (price) of a company share that an investor will purchase shares of the company where the minimum price is determined by the par value. Also the most speculative pricing! Supply, Demand, Emotions (FMO) and Greed are drive market pricing. 
 
 ## Common Stock
 From: https://www.investopedia.com/ask/answers/difference-between-preferred-stock-and-common-stock/
