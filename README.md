@@ -1,5 +1,5 @@
 # Private Placement Offering
-A traditional private placement offering inveolves filing a FORM D on the SEC.GOV EDGAR filing system, create a private placement memorandum and then search for qualified and accreditted investors.
+A traditional private placement offering involves filing a FORM D on the SEC.GOV EDGAR filing system, create a private placement memorandum and then search for qualified and accreditted investors.
 
 The introduction to equity trading tokens on the etheruem network made the search for accredited investors easier.
 
