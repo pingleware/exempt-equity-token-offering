@@ -67,6 +67,17 @@ A possible strategy to introduce new private equity offering and generate a mark
 
 A possible secondary market for private equity offering for allowable sales is through LedgerDex.com see more at https://www.ledgerdex.com/about/. Conversion between ETH and WETH must be included in the smart contract, as well as the allowance permission must be in compliance with secondary resales of private equity offerrings.
 
+Other exchanges for acrredited investors to sell private equity tokens include,
+
+    Uniswap (https://uniswap.exchange) https://www.leewayhertz.com/tokens-on-uniswap-exchange
+    Changelly (https://changelly.com/for-tokens)
+    List a Token (https://listatoken.com/)
+    Second BTC (https://secondbtc.com/market)
+    IDEX (https://idex.io/)
+    EtherDelta (https://etherdelta.com/)
+
+Keep in mind, that private equity tokens may only be sold publicly after the accredited investor has held them for 12 months.
+
 WARNING!
 UNLESS THE FOUNDER IN THE ABOVE SCENARIO COMMITS TO FULL DISCLOSURE INCLUDE VOLUNTARY QUARTERLY AND ANNUAL REPORTING, THEIR ATTEMPTS TO CREATE MARKET VALUE COULD BE CONCEIVED AS A PUMP-AND-DUMP SCHEME AND BE SUBJECT TO SEC ENFORCEMENT AND CRIMINAL PROSECUTION.
 
