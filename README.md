@@ -1,15 +1,15 @@
 # Private Placement Offering
-A traditional private placement offering involves filing a FORM D on the SEC.GOV EDGAR filing system, create a private placement memorandum and then search for qualified and accreditted investors. Prior to crytocurrency and blockchain, liquidity in the private equity markets were limited until the company initiated an IPO. Under rule 144, creates liquidity in a private equity offering after twelve months from each sale of restricted securities. Using an cryptocurrency for the private equity offering on the Ethereum network can create compliance liquidity before an IPO as well as generate a market value.
+A traditional private placement offering involves filing a FORM D on the SEC.GOV EDGAR filing system, creating a private placement memorandum and then searching for qualified and accredited investors. Prior to cryptocurrency and blockchain, liquidity in the private equity markets was limited until the company initiated an IPO. Under rule 144, creates liquidity in a private equity offering after twelve months from each sale of restricted securities. Using cryptocurrency for the private equity offering on the Ethereum network can create compliance liquidity before an IPO as well as generate a market value.
 
 (THE FOLLOWING STATEMENTS ARE CLASSIFIED AS OPINIONS, SUBJECT TO VERIFICATION, etc. AND NOT LEGAL NOR INVESTMENT ADVICE!)
 
-The introduction to equity trading tokens on the etheruem network make the search for accredited investors easier because liquidity is possible after the first twelve months of the offering under Rule 144. Market rate of the equity is established when the accredited investors have resold their holdings after twelve months have lapsed. Establishing a market rate in a private equity offering, can prevent exhorbitant valuations when a full IPO/DPO via a S-1 becomes effective.
+The introduction to equity trading tokens on the etheruem network make the search for accredited investors easier because liquidity is possible after the first twelve months of the offering under Rule 144. The market rate of the equity is established when the accredited investors have resold their holdings after twelve months have lapsed. Establishing a market rate in a private equity offering can prevent exorbitant valuations when a full IPO/DPO via a S-1 becomes effective.
 
 Issuing preferred stock only during the private equity offering adds protection for the investors by placing them in a protected class similar to creditors, so in the event of court-ordered liquidation, the company assets can be sold to recover preferred equity investors funds.
 
 A private equity offering should limit the maximum preferred shares to 10% of the total authorized shares specified in the company's charter, otherwise additional reporting requirements will be needed when new investors are vested. For example, a company with 1,000,000 authorized shares listed in it's charter, should limit private equity preferred outstanding shares to 100,000. The remaining 900,000 authorized shares can used for other offerings at a later date.
 
-## General Soliciation - Rule 506(c)
+## General Solicitation - Rule 506(c)
 From https://www.sec.gov/smallbusiness/exemptofferings/rule506c
 
 Rule 506(c) permits issuers to broadly solicit and generally advertise an offering, provided that:
@@ -24,6 +24,8 @@ From: https://www.sec.gov/smallbusiness/exemptofferings/faq
 “Restricted securities” are previously-issued securities held by security holders that are not freely tradable. Securities Act Rule 144(a)(3) identifies what offerings produce restricted securities. After such a transaction, the security holders can only resell the securities into the market by using an effective registration statement under the Securities Act or a valid exemption from registration for the resale, such as Rule 144.
 
 Rule 144 is a "safe harbor" under Section 4(a)(1) providing objective standards that a security holder can rely on to meet the requirements of that exemption. Rule 144 permits the resale of restricted securities if a number of conditions are met, including holding the securities for six months or one year, depending on whether the issuer has been filing reports under the Exchange Act. Rule 144 may limit the amount of securities that can be sold at one time and may restrict the manner of sale, depending on whether the security holder is an affiliate. An affiliate of a company is a person that, directly, or indirectly through one or more intermediaries controls, or is controlled by, or is under common control with, the company.
+
+EIP-2569 can also be use to save a stock certificate with the token sale on the blockchain when the investment is first made.
 
 ### Rule 144: Selling Restricted and Control Securities
 From: https://www.sec.gov/reportspubs/investor-publications/investorpubsrule144htm.html
@@ -61,13 +63,13 @@ From: https://www.sec.gov/info/smallbus/secg/rules144-145-secg.htm
 
 In accordance with the Rule 144 compliance guide, no restricted securities may be resold during the first six months after the commencement of the offering; investors may resell their restricted securities after six months of the offering but before the first year (12 months) have lapse as long as Rule 144 reporting requirements have been satisfied; after the offering has lapsed for twelve months (1 year), unlimited public resale of restricted securities may commence without Rule 144 compliance.
 
-Important note: Only accredited investors can buy shares in 506(c) offering and those accredited investors may sell their holdings freely in the open market after thet have held the shares for at least 12 months from the date they fully paid for the shares. For example, a company creates a private equity offering through the ethereum network, only 1% of the outstanding shares are sold in the first twelve months, then in month 15 another institutional investor buys 10% of the outstanding shares. That insttitutional investor must wait for 12 months after the payment for the shares is received before they can offer for sale to the public.
+Important note: Only accredited investors can buy shares in 506(c) offering and those accredited investors may sell their holdings freely in the open market after they have held the shares for at least 12 months from the date they fully paid for the shares. For example, a company creates a private equity offering through the ethereum network, only 1% of the outstanding shares are sold in the first twelve months, then in month 15 another institutional investor buys 10% of the outstanding shares. That insttitutional investor must wait for 12 months after the payment for the shares is received before they can offer for sale to the public.
 
-A possible strategy to introduce new private equity offering and generate a market price after twelve months is for the founder to purchase a minimum of outstanding shares at the time that the offering commences, filing the SEC Form 3 as required, then wait for 12 months, submitting reports during the wait period, then offering their otustanding shares to the public, filing the SEC Form 4, keeping in mind that the market price must be at least the par value amount. The founder shares could be offered on a secondary ethereum exchange which creates a market price that cna be used is market valuations and attract additional accredited investors to the private equity offering? If only the founder invested in the private equity offering for the first twelve months, the company's public float is still zero until the founder resells their outstanding shares on the secondary market. [the purpose of this strategy is to obtain a merket value when interest in the private equity offering is very low?]
+A possible strategy to introduce new private equity offering and generate a market price after twelve months is for the founder to purchase a minimum of outstanding shares at the time that the offering commences (cannot exceed 1% of the outstanding. e.g. 1% of 100,000 = 1,000 - this rule prevents a pump-n-dump scenario by the insiders), filing the SEC Form 3 as required, then wait for 12 months, submitting reports during the wait period, then offering their otustanding shares to the public, filing the SEC Form 4, keeping in mind that the market price must be at least the par value amount. The founder shares could be offered on a secondary ethereum exchange which creates a market price that cna be used is market valuations and attract additional accredited investors to the private equity offering? If only the founder invested in the private equity offering for the first twelve months, the company's public float is still zero until the founder resells their outstanding shares on the secondary market. [the purpose of this strategy is to obtain a merket value when interest in the private equity offering is very low?]
 
 A possible secondary market for private equity offering for allowable sales is through LedgerDex.com see more at https://www.ledgerdex.com/about/. Conversion between ETH and WETH must be included in the smart contract, as well as the allowance permission must be in compliance with secondary resales of private equity offerrings.
 
-Other exchanges for acrredited investors to sell private equity tokens include,
+Other exchanges for acredited investors to sell private equity tokens include,
 
     Uniswap (https://uniswap.exchange) https://www.leewayhertz.com/tokens-on-uniswap-exchange
     Changelly (https://changelly.com/for-tokens)
@@ -84,6 +86,8 @@ UNLESS THE FOUNDER IN THE ABOVE SCENARIO COMMITS TO FULL DISCLOSURE INCLUDE VOLU
 ## Rule 144 Reporting
 During the initial six to twelve months, any resale of restricted securities must complete form 144 available at https://www.sec.gov/files/form144.pdf
 
+Using EIP-2569, the SEC Form 144 can be attached to token transaction when an accredited investor chooses to sell some or all of their holdings. The Form 144 is simultaneously files on EDGAR as per SEC reporting requirements.
+
 # EIP's under consideration
 The following EIP's are being considered for the implementation the smart contract,
 
@@ -95,6 +99,7 @@ The following EIP's are being considered for the implementation the smart contra
     EIP-2018: Clearable Token [https://eips.ethereum.org/EIPS/eip-2018]
     EIP-2400: URL Format for Transaction Receipts [https://eips.ethereum.org/EIPS/eip-2400]
     EIP-2021: Payoutable Token [https://eips.ethereum.org/EIPS/eip-2021]
+    EIP-2569: Saving and Displaying Image Onchain for Universal Tokens [https://eips.ethereum.org/EIPS/eip-2569]
 
 This is a preliminerary list and not all EIP's will be implemented as well as other EIP's may be considered.
 
