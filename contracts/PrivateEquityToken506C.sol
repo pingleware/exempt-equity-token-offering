@@ -25,7 +25,7 @@ contract PrivateEquityToken506C is ERC884, Whitelistable, IERC20GetImageSvg, Tim
 
     uint256 public _holdingTime = Time.createTime + (52 * 1 weeks);
 
-    uint public _parValue = 10; 
+    uint public _parValue = 10;
 
     event ChangedCompanyStatus(address authorizedBy, bool newStatus);
     
@@ -147,5 +147,11 @@ contract PrivateEquityToken506C is ERC884, Whitelistable, IERC20GetImageSvg, Tim
 
         emit Transfer(original, replacement, balances[replacement]);
     }
-    
+
+    /**
+    * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
+    */
+    function getValue(uint param) public returns (uint) {
+        return 0;
+    }
 }
