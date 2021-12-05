@@ -1,20 +1,19 @@
 pragma solidity ^0.8.10;
 
 /**
- * Regulation A: Tier 1
+ * Regulation A: Tier 2
  * --------------------
  * See https://www.investor.gov/introduction-investing/investing-basics/glossary/regulation
  *
- * Under Tier 1, an issuer can raise up to $20 million in any 12-month period, including no more than $6 million on behalf of selling security holders that are
- * affiliates of the issuer.  In addition to qualification by SEC staff, companies offering securities pursuant to Tier 1 of Regulation A will also need to file
- * and have their offering statements qualified by the state securities regulators in the states in which the issuer plans to sell its securities.
- * Companies offering securities under Tier 1 do not have ongoing reporting requirements other than a final report on Form 1-Z on the status of the offering.
+ * Under Tier 2, an issuer can raise up to $50 million in any 12-month period, including no more than $15 million on behalf of selling securityholders that are
+ * affiliates of the issuer.  Unlike Tier 1 offerings, the offering statement does not have to be qualified by a state securities regulator, and the issuer is subject to
+ * ongoing reporting requirements in the form of an annual report on Form 1-K, a semiannual report on Form 1-SA and a current report on Form 1-U.
  */
 
 import "./token/ERC884/ERC884.sol";
 import "./Time.sol";
 
-contract PrivateEquityTokenAT1 is ERC884, MintableToken, Time {
+contract EquityTokenAT2 is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -33,8 +32,8 @@ contract PrivateEquityTokenAT1 is ERC884, MintableToken, Time {
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
     uint constant public parValue = 10;
-    unit constant public totalValueMax = 20000000;
-    uint constant public totalAffiliateMax = 6000000;
+    unit constant public totalValueMax = 50000000;
+    uint constant public totalAffiliateMax = 15000000;
     uint private totalValue = 0;
 
     uint private year = 52 weeks;

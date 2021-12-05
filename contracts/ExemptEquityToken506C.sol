@@ -7,7 +7,7 @@ import "./Whitelistable.sol";
 import "./IERC20GetImageSvg.sol";
 import "./Time.sol";
 
-contract PrivateEquityToken506C is ERC884, Whitelistable, IERC20GetImageSvg, Time {
+contract ExemptEquityToken506C is ERC884, Whitelistable, IERC20GetImageSvg, Time {
 
     string public symbol;
     string public name;

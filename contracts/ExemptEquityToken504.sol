@@ -1,19 +1,23 @@
 pragma solidity ^0.8.10;
 
 /**
- * Regulation A: Tier 2
- * --------------------
- * See https://www.investor.gov/introduction-investing/investing-basics/glossary/regulation
- *
- * Under Tier 2, an issuer can raise up to $50 million in any 12-month period, including no more than $15 million on behalf of selling securityholders that are
- * affiliates of the issuer.  Unlike Tier 1 offerings, the offering statement does not have to be qualified by a state securities regulator, and the issuer is subject to
- * ongoing reporting requirements in the form of an annual report on Form 1-K, a semiannual report on Form 1-SA and a current report on Form 1-U.
+ * Rule 504 permits certain issuers to offer and sell up to $1 million of securities
+ * in any 12-month period.  These securities may be sold to any number and
+ * type of investor, and the issuer is not subject to specific disclosure requirements.
+ * Generally, securities issued under Rule 504 will be restricted securities
+ * (as further explained below), unless the offering meets certain additional requirements.
+ * As a prospective investor, you should confirm with the issuer whether the securities
+ * being offered under this rule will be restricted.
  */
+
+ /**
+  * A par value of $10 will permit a maximum of 100,000 shares
+  */
 
 import "./token/ERC884/ERC884.sol";
 import "./Time.sol";
 
-contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
+contract ExemptEquityToken504 is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -32,13 +36,14 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
     uint constant public parValue = 10;
-    unit constant public totalValueMax = 50000000;
-    uint constant public totalAffiliateMax = 15000000;
+    unit constant public totalValueMax = 1000000;
     uint private totalValue = 0;
+
+    bool private restricted = true;
 
     uint private year = 52 weeks;
 
-    constructor(string _symbol, string _name, uint _supply) {
+    constructor(string _symbol, string _name, uint _supply, string hash, address _registry,string calldata svgCode) {
       symbol = _symbol;
       name = _name;
       totalSupply_ = _supply;
@@ -65,11 +70,23 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
     }
 
     modifier isOfferingExpired() {
-      require(Time.currentTime < (creationTime * year),"offering has expired!");
+      require(Time.currentTime < (creationTime * 52 weeks),"offering has expired!");
     }
 
     modifier isPriceBelowParValue(uint amount) {
-      require(amount > parValue, "amount is below par value");
+      require(amount >= parValue, "amount is below par value");
+    }
+
+    modifier isRestrictedSecurity() {
+      require(restricted != false, "security is restricted");
+    }
+
+    modifier hasHoldingTimeElapse(address addr) {
+      for ( i = 0; i < transactions.length; i++ ) {
+        if (transactions[i][0] == addr) {
+          require(transactions[i][2] > (Time.currentTime * year),"minimum holding has not elapsed");
+        }
+      }
     }
 
     /**
@@ -82,10 +99,14 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         public
         onlyOwner
         canMint
+        isVerifiedAddress(_to)
         isOfferingExpired()
-        isBelowParValue(_amount)
+        isPriceBelowParValue(_amount)
         returns (bool)
     {
+      // Before minting a new token/share, a check MUST performed to ensure that the threshold of $1,000,000 has not been reached
+      // and the offering is till within the first twelve months of contract creation?
+      _;
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
         updateShareholders(_to);
@@ -100,7 +121,7 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         return super.mint(_to, _amount);
     }
 
-    /**
+/**
     * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
     */
     function getValue(uint param) public returns (uint) {
@@ -117,7 +138,7 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         view
         returns (uint)
     {
-        return shareholders.length + nonaccredited_shareholders.length;
+        return shareholders.length;
     }
 
     /**
@@ -133,7 +154,7 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         view
         returns (address)
     {
-        require(index < shareholders.length, "out of bounds");
+        require(index < shareholders.length, "");
         return shareholders[index];
     }
 
@@ -213,6 +234,7 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         onlyOwner
         isShareholder(original)
         isNotShareholder(replacement)
+        isVerifiedAddress(replacement)
     {
         // replace the original address in the shareholders array
         // and update all the associated mappings
@@ -236,7 +258,9 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
      */
     function transfer(address to, uint256 value)
         public
+        isRestrictedSecurity()
         isHolder(msg.sender)
+        hasHoldingTimeElapse(msg.sender)
         returns (bool)
     {
         updateShareholders(to);
@@ -253,7 +277,9 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
      */
     function transferFrom(address from, address to, uint256 value)
         public
+        isRestrictedSecurity()
         isHolder(from)
+        hasHoldingTimeElapse(from)
         returns (bool)
     {
         updateShareholders(to);
@@ -364,14 +390,6 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         }
     }
 
-    function updateNonaccredited(address addr)
-        internal
-    {
-        if (holderIndices[addr] == 0) {
-            holderIndices[addr] = unaccredited_shareholders.push(addr);
-        }
-    }
-
     /**
      *  If the address is in the `shareholders` array and the forthcoming
      *  transfer or transferFrom will reduce their balance to 0, then
@@ -399,4 +417,5 @@ contract PrivateEquityTokenAT2 is ERC884, MintableToken, Time {
         // and zero out the index for addr
         holderIndices[addr] = 0;
     }
+
 }

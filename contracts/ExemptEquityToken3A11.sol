@@ -1,20 +1,30 @@
 pragma solidity ^0.8.10;
 
 /**
- * Under Rule 505, issuers may offer and sell up to $5 million of their securities
- * in any 12-month period.  There are limits on the types of investors who may purchase
- * the securities.  The issuer may sell to an unlimited number of accredited investors,
- * but to no more than 35 non-accredited investors.  If the issuer sells its securities to
- * non-accredited investors, the issuer must disclose certain information about itself,
- * including its financial statements.  If sales are made only to accredited investors,
- * the issuer has discretion as to what to disclose to investors.  Any information provided
- * to accredited investors must be provided to non-accredited investors.
+ * Intrastate:Section 3(a)(11)
+ * ---------------------------
+ * See https://www.sec.gov/smallbusiness/exemptofferings/intrastateofferings
+ *
+ * Section 3(a)(11) of the Securities Act is generally known as the
+ * “intrastate offering exemption.” This exemption seeks to facilitate the financing of
+ * local business operations. To qualify for the intrastate offering exemption,
+ * a company must:
+ *
+ *   - be organized in the state where it is offering the securities
+ *   - carry out a significant amount of its business in that state and
+ *   - make offers and sales only to residents of that state
+ *
+ * The intrastate offering exemption does not limit the size of the offering or the number
+ * of purchasers. A company must determine the residence of each offeree and purchaser.
+ * If any of the securities are offered or sold to even one out-of-state person,
+ * the exemption may be lost. Without the exemption, the company would be in violation
+ * of the Securities Act if the offering does not qualify for another exemption.
  */
 
 import "./token/ERC884/ERC884.sol";
 import "./Time.sol";
 
-contract PrivateEquityToken505 is ERC884, MintableToken, Time {
+contract ExemptEquityToken3A11 is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -26,48 +36,40 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
     mapping(address => bytes32) private verified;
     mapping(address => address) private cancellations;
     mapping(address => uint256) private holderIndices;
-    mapping(address => uint256) private transactions;
 
     address[] private shareholders;
-    address[] private nonaccredited_shareholders;
 
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
     uint constant public parValue = 10;
-    unit constant public totalValueMax = 5000000;
-    unit constant public maxNonaccredited = 35;
     uint private totalValue = 0;
 
     bool private restricted = true;
 
-    constructor(string _symbol, string _name, uint _supply, string hash, address _registry,string calldata svgCode) {
+    constructor(string _symbol, string _name, uint _supply) {
       symbol = _symbol;
       name = _name;
       totalSupply_ = _supply;
     }
 
     modifier isVerifiedAddress(address addr) {
-        require(verified[addr] != ZERO_BYTES, "address cannot be empty?");
+        require(verified[addr] != ZERO_BYTES,"missing address");
         _;
     }
 
     modifier isShareholder(address addr) {
-        require(holderIndices[addr] != 0, "address cannot be empty?");
+        require(holderIndices[addr] != 0,"already a shareholder");
         _;
     }
 
     modifier isNotShareholder(address addr) {
-        require(holderIndices[addr] == 0, "address cannot be empty?");
+        require(holderIndices[addr] == 0,"already a shareholder");
         _;
     }
 
     modifier isNotCancelled(address addr) {
-        require(cancellations[addr] == ZERO_ADDRESS, "address cannot be empty?");
+        require(cancellations[addr] == ZERO_ADDRESS,"missing address");
         _;
-    }
-
-    modifier isOfferingExpired() {
-      require(Time.currentTime < (creationTime * 52 weeks),"offering has expired!");
     }
 
     modifier isPriceBelowParValue(uint amount) {
@@ -78,55 +80,24 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
       require(restricted != false, "security is restricted");
     }
 
-    modifier hasHoldingTimeElapse(address addr) {
-      for ( i = 0; i < transactions.length; i++ ) {
-        if (transactions[i][0] == addr) {
-          require(transactions[i][2] > (Time.currentTime * 52 weeks),"minimum holding has not elapsed");
-        }
-      }
-    }
-
     /**
      * As each token is minted it is added to the shareholders array.
      * @param _to The address that will receive the minted tokens.
      * @param _amount The amount of tokens to mint.
-     * @param _accredited If investor is an accredited investor (true) or non-accredited investor (false)
      * @return A boolean that indicates if the operation was successful.
      */
-    function mint(address _to, uint256 _amount, bool _accredited)
+    function mint(address _to, uint256 _amount)
         public
         onlyOwner
         canMint
         isVerifiedAddress(_to)
-        isOfferingExpired()
-        isBelowParValue(_amount)
+        isPriceBelowParValue(_amount)
         returns (bool)
     {
-        require(_accredited,"accredited parameter is not valid");
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
-        if (_accredited) {
-          updateShareholders(_to);
-        } else {
-          require(nonAccreditedCount() <= maxNonaccredited,"exceeds the maximum number of nonaccredited investors");
-          updateNonaccredited(_to);
-        }
-
-        // update totalValue
-        require(totalValue <= totalValueMax,"maximum offering amount has been raised");
-        totalValue += _amount;
-        require(totalValue <= totalValueMax,"this sale will exceed the maximum offering limit");
-
-        transactions.push([_to,_amount,Time.currentTime]);
-
+        updateShareholders(_to);
         return super.mint(_to, _amount);
-    }
-
-    /**
-    * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
-    */
-    function getValue(uint param) public returns (uint) {
-        return totalValue;
     }
 
     /**
@@ -139,17 +110,8 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         view
         returns (uint)
     {
-        return shareholders.length + nonaccredited_shareholders.length;
+        return shareholders.length;
     }
-
-    function nonAccreditedCount() 
-        public
-        onlyOwner
-        view
-        return (uint)
-      {
-        return nonaccredited_shareholders.length;
-      }
 
     /**
      *  By counting the number of token holders using `holderCount`
@@ -164,7 +126,7 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         view
         returns (address)
     {
-        require(index < shareholders.length, "out of bounds");
+        require(index < shareholders.length,"out of bounds");
         return shareholders[index];
     }
 
@@ -181,9 +143,9 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         onlyOwner
         isNotCancelled(addr)
     {
-        require(addr != ZERO_ADDRESS, "");
-        require(hash != ZERO_BYTES, "");
-        require(verified[addr] == ZERO_BYTES, "");
+        require(addr != ZERO_ADDRESS,"missing address");
+        require(hash != ZERO_BYTES,"missing address");
+        require(verified[addr] == ZERO_BYTES,"verified address exists");
         verified[addr] = hash;
         emit VerifiedAddressAdded(addr, hash, msg.sender);
     }
@@ -199,7 +161,7 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         public
         onlyOwner
     {
-        require(balances[addr] == 0, "");
+        require(balances[addr] == 0,"verified address has a balance");
         if (verified[addr] != ZERO_BYTES) {
             verified[addr] = ZERO_BYTES;
             emit VerifiedAddressRemoved(addr, msg.sender);
@@ -221,7 +183,7 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         onlyOwner
         isVerifiedAddress(addr)
     {
-        require(hash != ZERO_BYTES, "");
+        require(hash != ZERO_BYTES,"missing hash");
         bytes32 oldHash = verified[addr];
         if (oldHash != hash) {
             verified[addr] = hash;
@@ -261,16 +223,15 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
 
     /**
      *  The `transfer` function MUST NOT allow transfers to addresses that
-     *  verification is NOT needed for 504 rule.
+     *  have not been verified and added to the contract.
      *  If the `to` address is not currently a shareholder then it MUST become one.
      *  If the transfer will reduce `msg.sender`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
     function transfer(address to, uint256 value)
         public
+        isVerifiedAddress(to)
         isRestrictedSecurity()
-        isHolder(msg.sender)
-        hasHoldingTimeElapse(msg.sender)
         returns (bool)
     {
         updateShareholders(to);
@@ -287,9 +248,8 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
      */
     function transferFrom(address from, address to, uint256 value)
         public
+        isVerifiedAddress(to)
         isRestrictedSecurity()
-        isHolder(from)
-        hasHoldingTimeElapse(from)
         returns (bool)
     {
         updateShareholders(to);
@@ -397,14 +357,6 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
     {
         if (holderIndices[addr] == 0) {
             holderIndices[addr] = shareholders.push(addr);
-        }
-    }
-
-    function updateNonaccredited(address addr)
-        internal
-    {
-        if (holderIndices[addr] == 0) {
-            holderIndices[addr] = unaccredited_shareholders.push(addr);
         }
     }
 

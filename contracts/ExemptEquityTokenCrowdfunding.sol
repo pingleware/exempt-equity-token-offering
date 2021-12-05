@@ -6,7 +6,7 @@ pragma solidity ^0.8.10;
  * See https://www.sec.gov/info/smallbus/secg/rccomplianceguide-051316.htm
  */
 
-contract PrivateEquityTokenCrowdfunding {
+contract ExemptEquityTokenCrowdfunding {
   constructor() {
   }
 }

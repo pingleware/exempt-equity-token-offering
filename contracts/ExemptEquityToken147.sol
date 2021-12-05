@@ -1,30 +1,54 @@
 pragma solidity ^0.8.10;
 
 /**
- * Intrastate:Section 3(a)(11)
- * ---------------------------
+ * Intrastate: Rule 147
+ * --------------------
  * See https://www.sec.gov/smallbusiness/exemptofferings/intrastateofferings
  *
- * Section 3(a)(11) of the Securities Act is generally known as the
- * “intrastate offering exemption.” This exemption seeks to facilitate the financing of
- * local business operations. To qualify for the intrastate offering exemption,
- * a company must:
+ * Rule 147 is considered a “safe harbor” under Section 3(a)(11),
+ * providing objective standards that a company can rely on to meet the requirements of
+ * that exemption. Rule 147, as amended, has the following requirements:
  *
- *   - be organized in the state where it is offering the securities
- *   - carry out a significant amount of its business in that state and
- *   - make offers and sales only to residents of that state
+ *  - the company must be organized in the state where it offers and sells securities
+ *  - the company must have its “principal place of business” in-state and satisfy at least one “doing business” requirement that demonstrates the in-state
+ *    nature of the company’s business
+ *  - offers and sales of securities can only be made to in-state residents or persons who the company reasonably believes are in-state residents and
+ *  - the company obtains a written representation from each purchaser providing the residency of that purchaser
  *
- * The intrastate offering exemption does not limit the size of the offering or the number
- * of purchasers. A company must determine the residence of each offeree and purchaser.
- * If any of the securities are offered or sold to even one out-of-state person,
- * the exemption may be lost. Without the exemption, the company would be in violation
- * of the Securities Act if the offering does not qualify for another exemption.
+ * Securities purchased in an offering under Rule 147 limit resales to persons residing within the state of the offering for a period of six months
+ * from the date of the sale by the issuer to the purchaser. In addition, a company must comply with state securities laws and regulations in the states
+ * in which securities are offered or sold.
+ * 
+ * Intrastate: Rule 147A
+ * ---------------------
+ * See https://www.sec.gov/smallbusiness/exemptofferings/intrastateofferings
+ *
+ * Rule 147A is a new intrastate offering exemption adopted by the Commission in
+ * October 2016. Rule 147A is substantially identical to Rule 147 except that Rule 147A:
+ *
+ *  - allows offers to be accessible to out-of-state residents, so long sales are only made to in-state residents and
+ *  - permits a company to be incorporated or organized out-of-state, so long as the company has its “principal place of business” in-state
+ *    and satisfies at least one “doing business” requirement that demonstrates the in-state nature of the company’s business
  */
+
+/**
+* Under 147
+* ---------
+* Example: a company must be incorporated and doing business in Florida and can only offer a private equity exempt offering to the residents of
+* Florida ONLY!
+*
+* Under 147-A
+* -----------
+* Example: a company may be incorporated in Delaware and doing business in Florida, and hence may offer private equity sales in Florida as long as
+* they meet the "doing business" criteria. If business meets the "doing business" requirement for both states, then a private equity offering
+* may be offered to the residents of both the state of Delaware and Florida.
+*/
+
 
 import "./token/ERC884/ERC884.sol";
 import "./Time.sol";
 
-contract PrivateEquityToken3A11 is ERC884, MintableToken, Time {
+contract ExemptEquityToken147 is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -36,15 +60,20 @@ contract PrivateEquityToken3A11 is ERC884, MintableToken, Time {
     mapping(address => bytes32) private verified;
     mapping(address => address) private cancellations;
     mapping(address => uint256) private holderIndices;
+    mapping(address => uint256) private transactions;
 
     address[] private shareholders;
 
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
     uint constant public parValue = 10;
+    unit constant public totalValueMax = 1000000;
     uint private totalValue = 0;
 
     bool private restricted = true;
+
+    uint private year = 52 weeks;
+    uint private sixmonths = 26 weeks;
 
     constructor(string _symbol, string _name, uint _supply) {
       symbol = _symbol;
@@ -53,23 +82,27 @@ contract PrivateEquityToken3A11 is ERC884, MintableToken, Time {
     }
 
     modifier isVerifiedAddress(address addr) {
-        require(verified[addr] != ZERO_BYTES,"missing address");
+        require(verified[addr] != ZERO_BYTES, "address cannot be empty?");
         _;
     }
 
     modifier isShareholder(address addr) {
-        require(holderIndices[addr] != 0,"already a shareholder");
+        require(holderIndices[addr] != 0, "address cannot be empty?");
         _;
     }
 
     modifier isNotShareholder(address addr) {
-        require(holderIndices[addr] == 0,"already a shareholder");
+        require(holderIndices[addr] == 0, "address cannot be empty?");
         _;
     }
 
     modifier isNotCancelled(address addr) {
-        require(cancellations[addr] == ZERO_ADDRESS,"missing address");
+        require(cancellations[addr] == ZERO_ADDRESS, "address cannot be empty?");
         _;
+    }
+
+    modifier isOfferingExpired() {
+      require(Time.currentTime < (creationTime * sixmonths),"offering has expired!");
     }
 
     modifier isPriceBelowParValue(uint amount) {
@@ -90,6 +123,7 @@ contract PrivateEquityToken3A11 is ERC884, MintableToken, Time {
         public
         onlyOwner
         canMint
+        isOfferingExpired()
         isVerifiedAddress(_to)
         isPriceBelowParValue(_amount)
         returns (bool)

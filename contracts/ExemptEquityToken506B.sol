@@ -1,54 +1,33 @@
 pragma solidity ^0.8.10;
 
 /**
- * Intrastate: Rule 147
- * --------------------
- * See https://www.sec.gov/smallbusiness/exemptofferings/intrastateofferings
+ * Rule 506(b)
+ * -----------
+ * https://www.sec.gov/smallbusiness/exemptofferings/
  *
- * Rule 147 is considered a “safe harbor” under Section 3(a)(11),
- * providing objective standards that a company can rely on to meet the requirements of
- * that exemption. Rule 147, as amended, has the following requirements:
+ * Rule 506(b) of Regulation D is considered a “safe harbor” under Section 4(a)(2). It provides objective standards that a company can rely on to meet the requirements
+ * of the Section 4(a)(2) exemption. Companies conducting an offering under Rule 506(b) can raise an unlimited amount of money and can sell securities to an
+ * unlimited number of accredited investors. An offering under Rule 506(b), however, is subject to the following requirements:
  *
- *  - the company must be organized in the state where it offers and sells securities
- *  - the company must have its “principal place of business” in-state and satisfy at least one “doing business” requirement that demonstrates the in-state
- *    nature of the company’s business
- *  - offers and sales of securities can only be made to in-state residents or persons who the company reasonably believes are in-state residents and
- *  - the company obtains a written representation from each purchaser providing the residency of that purchaser
+ *  - no general solicitation or advertising to market the securities
+ *  - securities may not be sold to more than 35 non-accredited investors (all non-accredited investors, either alone or with a purchaser representative,
+ *    must meet the legal standard of having sufficient knowledge and experience in financial and business matters to be capable of evaluating the merits and
+ *    risks of the prospective investment)
  *
- * Securities purchased in an offering under Rule 147 limit resales to persons residing within the state of the offering for a period of six months
- * from the date of the sale by the issuer to the purchaser. In addition, a company must comply with state securities laws and regulations in the states
- * in which securities are offered or sold.
- * 
- * Intrastate: Rule 147A
- * ---------------------
- * See https://www.sec.gov/smallbusiness/exemptofferings/intrastateofferings
+ * If non-accredited investors are participating in the offering, the company conducting the offering:
  *
- * Rule 147A is a new intrastate offering exemption adopted by the Commission in
- * October 2016. Rule 147A is substantially identical to Rule 147 except that Rule 147A:
+ *  - must give any non-accredited investors disclosure documents that generally contain the same type of information as provided in Regulation A offerings
+ *    (the company is not required to provide specified disclosure documents to accredited investors, but, if it does provide information to accredited investors,
+ *    it must also make this information available to the non-accredited investors as well)
+ *  - must give any non-accredited investors financial statement information specified in Rule 506 and
+ *  - should be available to answer questions from prospective purchasers who are non-accredited investors
  *
- *  - allows offers to be accessible to out-of-state residents, so long sales are only made to in-state residents and
- *  - permits a company to be incorporated or organized out-of-state, so long as the company has its “principal place of business” in-state
- *    and satisfies at least one “doing business” requirement that demonstrates the in-state nature of the company’s business
+ * Purchasers in a Rule 506(b) offering receive “restricted securities." A company is required to file a notice with the Commission on Form D within 15 days
+ * after the first sale of securities in the offering. Although the Securities Act provides a federal preemption from state registration and qualification
+ * under Rule 506(b), the states still have authority to require notice filings and collect state fees.
  */
 
-/**
-* Under 147
-* ---------
-* Example: a company must be incorporated and doing business in Florida and can only offer a private equity exempt offering to the residents of
-* Florida ONLY!
-*
-* Under 147-A
-* -----------
-* Example: a company may be incorporated in Delaware and doing business in Florida, and hence may offer private equity sales in Florida as long as
-* they meet the "doing business" criteria. If business meets the "doing business" requirement for both states, then a private equity offering
-* may be offered to the residents of both the state of Delaware and Florida.
-*/
-
-
-import "./token/ERC884/ERC884.sol";
-import "./Time.sol";
-
-contract PrivateEquityToken147 is ERC884, MintableToken, Time {
+contract ExemptEquityToken506B is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -63,17 +42,15 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
     mapping(address => uint256) private transactions;
 
     address[] private shareholders;
+    address[] private nonaccredited_shareholders;
 
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
-    uint constant public parValue = 10;
-    unit constant public totalValueMax = 1000000;
+    uint constant public parValue = 5;
+    unit constant public maxNonaccredited = 35;
     uint private totalValue = 0;
 
     bool private restricted = true;
-
-    uint private year = 52 weeks;
-    uint private sixmonths = 26 weeks;
 
     constructor(string _symbol, string _name, uint _supply) {
       symbol = _symbol;
@@ -101,10 +78,6 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
         _;
     }
 
-    modifier isOfferingExpired() {
-      require(Time.currentTime < (creationTime * sixmonths),"offering has expired!");
-    }
-
     modifier isPriceBelowParValue(uint amount) {
       require(amount > parValue, "amount is below par value");
     }
@@ -113,25 +86,52 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
       require(restricted != false, "security is restricted");
     }
 
+    modifier hasHoldingTimeElapse(address addr) {
+      for ( i = 0; i < transactions.length; i++ ) {
+        if (transactions[i][0] == addr) {
+          require(transactions[i][2] > (Time.currentTime * 52 weeks),"minimum holding has not elapsed");
+        }
+      }
+    }
+
     /**
      * As each token is minted it is added to the shareholders array.
      * @param _to The address that will receive the minted tokens.
      * @param _amount The amount of tokens to mint.
+     * @param _accredited If investor is an accredited investor (true) or non-accredited investor (false)
      * @return A boolean that indicates if the operation was successful.
      */
-    function mint(address _to, uint256 _amount)
+    function mint(address _to, uint256 _amount, bool _accredited)
         public
         onlyOwner
         canMint
-        isOfferingExpired()
         isVerifiedAddress(_to)
-        isPriceBelowParValue(_amount)
+        isBelowParValue(_amount)
         returns (bool)
     {
+        require(_accredited,"accredited parameter is not valid");
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
-        updateShareholders(_to);
+        if (_accredited) {
+          updateShareholders(_to);
+        } else {
+          require(nonAccreditedCount() <= maxNonaccredited,"exceeds the maximum number of nonaccredited investors");
+          updateNonaccredited(_to);
+        }
+
+        // update totalValue
+        totalValue += _amount;
+
+        transactions.push([_to,_amount,Time.currentTime]);
+
         return super.mint(_to, _amount);
+    }
+
+/**
+    * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
+    */
+    function getValue(uint param) public returns (uint) {
+        return totalValue;
     }
 
     /**
@@ -144,8 +144,17 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
         view
         returns (uint)
     {
-        return shareholders.length;
+        return shareholders.length + nonaccredited_shareholders.length;
     }
+
+    function nonAccreditedCount() 
+        public
+        onlyOwner
+        view
+        return (uint)
+      {
+        return nonaccredited_shareholders.length;
+      }
 
     /**
      *  By counting the number of token holders using `holderCount`
@@ -160,7 +169,7 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
         view
         returns (address)
     {
-        require(index < shareholders.length,"out of bounds");
+        require(index < shareholders.length, "out of bounds");
         return shareholders[index];
     }
 
@@ -177,9 +186,9 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
         onlyOwner
         isNotCancelled(addr)
     {
-        require(addr != ZERO_ADDRESS,"missing address");
-        require(hash != ZERO_BYTES,"missing address");
-        require(verified[addr] == ZERO_BYTES,"verified address exists");
+        require(addr != ZERO_ADDRESS, "");
+        require(hash != ZERO_BYTES, "");
+        require(verified[addr] == ZERO_BYTES, "");
         verified[addr] = hash;
         emit VerifiedAddressAdded(addr, hash, msg.sender);
     }
@@ -195,7 +204,7 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
         public
         onlyOwner
     {
-        require(balances[addr] == 0,"verified address has a balance");
+        require(balances[addr] == 0, "");
         if (verified[addr] != ZERO_BYTES) {
             verified[addr] = ZERO_BYTES;
             emit VerifiedAddressRemoved(addr, msg.sender);
@@ -217,7 +226,7 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
         onlyOwner
         isVerifiedAddress(addr)
     {
-        require(hash != ZERO_BYTES,"missing hash");
+        require(hash != ZERO_BYTES, "");
         bytes32 oldHash = verified[addr];
         if (oldHash != hash) {
             verified[addr] = hash;
@@ -257,15 +266,16 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
 
     /**
      *  The `transfer` function MUST NOT allow transfers to addresses that
-     *  have not been verified and added to the contract.
+     *  verification is NOT needed for 504 rule.
      *  If the `to` address is not currently a shareholder then it MUST become one.
      *  If the transfer will reduce `msg.sender`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
     function transfer(address to, uint256 value)
         public
-        isVerifiedAddress(to)
         isRestrictedSecurity()
+        isHolder(msg.sender)
+        hasHoldingTimeElapse(msg.sender)
         returns (bool)
     {
         updateShareholders(to);
@@ -282,8 +292,9 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
      */
     function transferFrom(address from, address to, uint256 value)
         public
-        isVerifiedAddress(to)
         isRestrictedSecurity()
+        isHolder(from)
+        hasHoldingTimeElapse(from)
         returns (bool)
     {
         updateShareholders(to);
@@ -391,6 +402,14 @@ contract PrivateEquityToken147 is ERC884, MintableToken, Time {
     {
         if (holderIndices[addr] == 0) {
             holderIndices[addr] = shareholders.push(addr);
+        }
+    }
+
+    function updateNonaccredited(address addr)
+        internal
+    {
+        if (holderIndices[addr] == 0) {
+            holderIndices[addr] = unaccredited_shareholders.push(addr);
         }
     }
 

@@ -27,7 +27,7 @@ pragma solidity ^0.8.10;
  *
  */
 
-contract PrivateEquityToken4A2 {
+contract ExemptEquityToken4A2 {
   constructor() {
   }
 }

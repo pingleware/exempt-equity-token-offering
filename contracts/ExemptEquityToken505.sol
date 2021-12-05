@@ -1,33 +1,20 @@
 pragma solidity ^0.8.10;
 
 /**
- * Rule 506(b)
- * -----------
- * https://www.sec.gov/smallbusiness/exemptofferings/
- *
- * Rule 506(b) of Regulation D is considered a “safe harbor” under Section 4(a)(2). It provides objective standards that a company can rely on to meet the requirements
- * of the Section 4(a)(2) exemption. Companies conducting an offering under Rule 506(b) can raise an unlimited amount of money and can sell securities to an
- * unlimited number of accredited investors. An offering under Rule 506(b), however, is subject to the following requirements:
- *
- *  - no general solicitation or advertising to market the securities
- *  - securities may not be sold to more than 35 non-accredited investors (all non-accredited investors, either alone or with a purchaser representative,
- *    must meet the legal standard of having sufficient knowledge and experience in financial and business matters to be capable of evaluating the merits and
- *    risks of the prospective investment)
- *
- * If non-accredited investors are participating in the offering, the company conducting the offering:
- *
- *  - must give any non-accredited investors disclosure documents that generally contain the same type of information as provided in Regulation A offerings
- *    (the company is not required to provide specified disclosure documents to accredited investors, but, if it does provide information to accredited investors,
- *    it must also make this information available to the non-accredited investors as well)
- *  - must give any non-accredited investors financial statement information specified in Rule 506 and
- *  - should be available to answer questions from prospective purchasers who are non-accredited investors
- *
- * Purchasers in a Rule 506(b) offering receive “restricted securities." A company is required to file a notice with the Commission on Form D within 15 days
- * after the first sale of securities in the offering. Although the Securities Act provides a federal preemption from state registration and qualification
- * under Rule 506(b), the states still have authority to require notice filings and collect state fees.
+ * Under Rule 505, issuers may offer and sell up to $5 million of their securities
+ * in any 12-month period.  There are limits on the types of investors who may purchase
+ * the securities.  The issuer may sell to an unlimited number of accredited investors,
+ * but to no more than 35 non-accredited investors.  If the issuer sells its securities to
+ * non-accredited investors, the issuer must disclose certain information about itself,
+ * including its financial statements.  If sales are made only to accredited investors,
+ * the issuer has discretion as to what to disclose to investors.  Any information provided
+ * to accredited investors must be provided to non-accredited investors.
  */
 
-contract PrivateEquityToken506B is ERC884, MintableToken, Time {
+import "./token/ERC884/ERC884.sol";
+import "./Time.sol";
+
+contract ExemptEquityToken505 is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -46,13 +33,14 @@ contract PrivateEquityToken506B is ERC884, MintableToken, Time {
 
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
-    uint constant public parValue = 5;
+    uint constant public parValue = 10;
+    unit constant public totalValueMax = 5000000;
     unit constant public maxNonaccredited = 35;
     uint private totalValue = 0;
 
     bool private restricted = true;
 
-    constructor(string _symbol, string _name, uint _supply) {
+    constructor(string _symbol, string _name, uint _supply, string hash, address _registry,string calldata svgCode) {
       symbol = _symbol;
       name = _name;
       totalSupply_ = _supply;
@@ -76,6 +64,10 @@ contract PrivateEquityToken506B is ERC884, MintableToken, Time {
     modifier isNotCancelled(address addr) {
         require(cancellations[addr] == ZERO_ADDRESS, "address cannot be empty?");
         _;
+    }
+
+    modifier isOfferingExpired() {
+      require(Time.currentTime < (creationTime * 52 weeks),"offering has expired!");
     }
 
     modifier isPriceBelowParValue(uint amount) {
@@ -106,6 +98,7 @@ contract PrivateEquityToken506B is ERC884, MintableToken, Time {
         onlyOwner
         canMint
         isVerifiedAddress(_to)
+        isOfferingExpired()
         isBelowParValue(_amount)
         returns (bool)
     {
@@ -120,14 +113,16 @@ contract PrivateEquityToken506B is ERC884, MintableToken, Time {
         }
 
         // update totalValue
+        require(totalValue <= totalValueMax,"maximum offering amount has been raised");
         totalValue += _amount;
+        require(totalValue <= totalValueMax,"this sale will exceed the maximum offering limit");
 
         transactions.push([_to,_amount,Time.currentTime]);
 
         return super.mint(_to, _amount);
     }
 
-/**
+    /**
     * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
     */
     function getValue(uint param) public returns (uint) {
