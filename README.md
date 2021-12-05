@@ -9,7 +9,7 @@ Issuing preferred stock only during the private equity offering adds protection 
 
 A private equity offering should limit the maximum preferred shares to 10% of the total authorized shares specified in the company's charter, otherwise additional reporting requirements will be needed when new investors are vested. For example, a company with 1,000,000 authorized shares listed in it's charter, should limit private equity preferred outstanding shares to 100,000. The remaining 900,000 authorized shares can used for other offerings at a later date.
 
-See assets/SEC.gov - Overview of Capital-Raising Exemptions.pdf for a complete list of exempt offerings.
+See https://www.sec.gov/smallbusiness/exemptofferings/exemptofferingschart for a complete list of exempt offerings.
 
 ## General Solicitation - Rule 506(c)
 From https://www.sec.gov/smallbusiness/exemptofferings/rule506c
