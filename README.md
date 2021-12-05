@@ -20,6 +20,12 @@ Rule 506(c) permits issuers to broadly solicit and generally advertise an offeri
 - the issuer takes reasonable steps to verify purchasers’ accredited investor status and
 - certain other conditions in Regulation D are satisfied
 
+From this posting https://www.huntonak.com/en/insights/sec-issues-new-rules-on-private-placements.html, if you conduct an offering with a General Solicitaion (506C), you cannot conduct another exempt offering until 30 days have pass.
+
+The Mechanics of a Section 4(a)(2) exempt offering at https://media2.mofo.com/documents/170608-4a2.pdf
+
+Investor Bulletin: Private Placements Under Regulation D at https://www.sec.gov/oiea/investor-alerts-bulletins/ib_privateplacements.html
+
 ## What are restricted securities?
 From: https://www.sec.gov/smallbusiness/exemptofferings/faq
 
