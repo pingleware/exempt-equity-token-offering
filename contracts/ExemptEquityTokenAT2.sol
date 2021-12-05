@@ -13,7 +13,7 @@ pragma solidity ^0.8.10;
 import "./token/ERC884/ERC884.sol";
 import "./Time.sol";
 
-contract EquityTokenAT2 is ERC884, MintableToken, Time {
+contract ExemptEquityTokenAT2 is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
