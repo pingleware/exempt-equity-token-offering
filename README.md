@@ -17,6 +17,10 @@ Investor Bulletin: Private Placements Under Regulation D at https://www.sec.gov/
 
 See https://www.sec.gov/smallbusiness/exemptofferings/exemptofferingschart for a complete list of exempt offerings.
 
+JUMPSTART OUR BUSINESS STARTUPS ACT at https://www.congress.gov/112/plaws/publ106/PLAW-112publ106.pdf
+
+A good source for the Private Placement required documents is at https://content.next.westlaw.com/Document/I3f10b79573f411e38578f7ccc38dcbee/View/FullText.html?contextData=(sc.Default) 
+
 ## General Solicitation - Rule 506(c)
 From https://www.sec.gov/smallbusiness/exemptofferings/rule506c
 
@@ -118,8 +122,9 @@ The following is a high order overview of the workflow plan,
     2. Out source an independent audit of the smart contract
     3. Prepare the Private Placement Memorandum with an attorney review and correction, if needed?
     4. Create a new Form D filing on SEC EDGAR Filing system with references to this code repository
-    5. Deploy the smart contract to the Ethereum main net
-    6. Contact preselected accredited investors.
+    5. Submit the Solicitation Materials Used in Rule 506(c) Offerings to https://www.sec.gov/forms/rule506c#no-back
+    6. Deploy the smart contract to the Ethereum main net
+    7. Contact preselected accredited investors.
 
 # Other Implementations
 Performing the following searches reveal other open source implementations,
