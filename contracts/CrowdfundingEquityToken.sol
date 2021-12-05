@@ -1,23 +1,27 @@
 pragma solidity ^0.8.10;
 
 /**
- * Rule 504 permits certain issuers to offer and sell up to $1 million of securities
- * in any 12-month period.  These securities may be sold to any number and
- * type of investor, and the issuer is not subject to specific disclosure requirements.
- * Generally, securities issued under Rule 504 will be restricted securities
- * (as further explained below), unless the offering meets certain additional requirements.
- * As a prospective investor, you should confirm with the issuer whether the securities
- * being offered under this rule will be restricted.
+ * Regulation Crowdfunding; Section 4(a)(6)
+ * ----------------------------------------
+ * See https://www.sec.gov/info/smallbus/secg/rccomplianceguide-051316.htm
+ *
+ * c. Transactions Conducted Through an Intermediary
+ *
+ * Each Regulation Crowdfunding offering must be exclusively conducted through one online platform. The intermediary operating the platform must be a broker-dealer
+ * or a funding portal that is registered with the SEC and FINRA.
+ *
+ * Issuers may rely on the efforts of the intermediary to determine that the aggregate amount of securities purchased by an investor does not cause the investor
+ * to exceed the investment limits, so long as the issuer does not have knowledge that the investor would exceed the investment limits as a result of purchasing
+ * securities in the issuer’s offering.
  */
 
- /**
-  * A par value of $10 will permit a maximum of 100,000 shares
-  */
+// IMPORTANT NOTE: BECUASE OF THE REGULATIONS FOR CROWD FUNDING MUST BE CONDUCTED THROUGH AN INTERMEDIATARY THAT IS REGISTERED AS A BROKER-DEAKER OR FUNDING PORTAL WITH
+// THE SEC AND FINRA, THIS CROWDFUNDING TOKEN IS USEFUL FOR ONLY A REGISTERED BROKER-DEALER OR FUNDING PORTAL THAT DESIRES TO OFFER A CRYPTOCURRENCY.
 
 import "./token/ERC884/ERC884.sol";
 import "./Time.sol";
 
-contract ExemptEquityToken504 is ERC884, MintableToken, Time {
+contract CrowdfundingEquityToken is ERC884, MintableToken, Time {
     string public symbol;
     string public name;
 
@@ -36,14 +40,17 @@ contract ExemptEquityToken504 is ERC884, MintableToken, Time {
     uint256 constant public creationTime = Time.createTime; // The contract creation time
 
     uint constant public parValue = 10;
-    unit constant public totalValueMax = 1000000;
+    unit constant public totalValueMax = 1070000;
+    uint constant public totalInvestorMax = 107000;
     uint private totalValue = 0;
-
-    bool private restricted = true;
 
     uint private year = 52 weeks;
 
-    constructor(string _symbol, string _name, uint _supply, string hash, address _registry,string calldata svgCode) {
+    uint constant public totalInvestorMax = 107000;
+
+    bool private restricted = true;
+
+    constructor(string _symbol, string _name, uint _supply) {
       symbol = _symbol;
       name = _name;
       totalSupply_ = _supply;
@@ -70,12 +77,17 @@ contract ExemptEquityToken504 is ERC884, MintableToken, Time {
     }
 
     modifier isOfferingExpired() {
-      require(Time.currentTime < (creationTime * 52 weeks),"offering has expired!");
+      require(Time.currentTime < (creationTime * year),"offering has expired!");
     }
 
     modifier isPriceBelowParValue(uint amount) {
-      require(amount >= parValue, "amount is below par value");
+      require(amount > parValue, "amount is below par value");
     }
+
+    modifier isInvestmentExceedLimit(uint amount) {
+      require(amount < totalInvestorMax, "may not exceed $107,000");
+    }
+
 
     modifier isRestrictedSecurity() {
       require(restricted != false, "security is restricted");
@@ -89,24 +101,64 @@ contract ExemptEquityToken504 is ERC884, MintableToken, Time {
       }
     }
 
+    function CalculateInvestorLimit(uint amount, uint income, uint networth) internal {
+      if (income < 107000) {
+        uint fivepct_income = income * 0.05;
+        uint fivepct_networth = networth * 0.05;
+
+        if (fivepct_income <= fivepct_networth) {
+          if (fivepct_income < 2200) {
+            return 2200;
+          } else {
+            return fivepct_income;
+          }
+        } else {
+          if (fivepct_networth < 2200) {
+            return 2200;
+          } else {
+            return fivepct_networth;
+          }
+        }
+      } else {
+        uint tenpct_income = income * 0.1;
+        uint tenpct_networth = networth * 0.1;
+
+        if (tenpct_income <= tenpct_networth) {
+          return tenpct_income;
+        } else {
+          return tenpct_networth;
+        }
+      }
+    }
+
+    function GetCurrentInvestment(address _address) internal {
+      uint total = 0;
+      for( i = 0; i < transactions.length; i++ ) {
+        if (transactions[i][0] == _address) {
+          total += transactions[1][1];
+        }
+      }
+      return total;
+    }
+
     /**
      * As each token is minted it is added to the shareholders array.
      * @param _to The address that will receive the minted tokens.
      * @param _amount The amount of tokens to mint.
      * @return A boolean that indicates if the operation was successful.
      */
-    function mint(address _to, uint256 _amount)
+    function mint(address _to, uint256 _amount, uint income, uint networth)
         public
         onlyOwner
         canMint
-        isVerifiedAddress(_to)
         isOfferingExpired()
-        isPriceBelowParValue(_amount)
+        isBelowParValue(_amount)
+        isInvestmentExceedLimit(_amount)
+        isInvestmentExceedLimit(GetCurrentInvestment(_to))
         returns (bool)
     {
-      // Before minting a new token/share, a check MUST performed to ensure that the threshold of $1,000,000 has not been reached
-      // and the offering is till within the first twelve months of contract creation?
-      _;
+        require(income, "missing annual income");
+        require(networth, "missing net worth");
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
         updateShareholders(_to);
@@ -234,7 +286,6 @@ contract ExemptEquityToken504 is ERC884, MintableToken, Time {
         onlyOwner
         isShareholder(original)
         isNotShareholder(replacement)
-        isVerifiedAddress(replacement)
     {
         // replace the original address in the shareholders array
         // and update all the associated mappings
@@ -417,5 +468,4 @@ contract ExemptEquityToken504 is ERC884, MintableToken, Time {
         // and zero out the index for addr
         holderIndices[addr] = 0;
     }
-
 }
