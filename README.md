@@ -9,6 +9,12 @@ Issuing preferred stock only during the private equity offering adds protection 
 
 A private equity offering should limit the maximum preferred shares to 10% of the total authorized shares specified in the company's charter, otherwise additional reporting requirements will be needed when new investors are vested. For example, a company with 1,000,000 authorized shares listed in it's charter, should limit private equity preferred outstanding shares to 100,000. The remaining 900,000 authorized shares can used for other offerings at a later date.
 
+From this posting https://www.huntonak.com/en/insights/sec-issues-new-rules-on-private-placements.html, if you conduct an offering with a General Solicitaion (506C), you cannot conduct another exempt offering until 30 days have pass.
+
+The Mechanics of a Section 4(a)(2) exempt offering at https://media2.mofo.com/documents/170608-4a2.pdf
+
+Investor Bulletin: Private Placements Under Regulation D at https://www.sec.gov/oiea/investor-alerts-bulletins/ib_privateplacements.html
+
 See https://www.sec.gov/smallbusiness/exemptofferings/exemptofferingschart for a complete list of exempt offerings.
 
 ## General Solicitation - Rule 506(c)
@@ -19,12 +25,6 @@ Rule 506(c) permits issuers to broadly solicit and generally advertise an offeri
 - all purchasers in the offering are accredited investors
 - the issuer takes reasonable steps to verify purchasers’ accredited investor status and
 - certain other conditions in Regulation D are satisfied
-
-From this posting https://www.huntonak.com/en/insights/sec-issues-new-rules-on-private-placements.html, if you conduct an offering with a General Solicitaion (506C), you cannot conduct another exempt offering until 30 days have pass.
-
-The Mechanics of a Section 4(a)(2) exempt offering at https://media2.mofo.com/documents/170608-4a2.pdf
-
-Investor Bulletin: Private Placements Under Regulation D at https://www.sec.gov/oiea/investor-alerts-bulletins/ib_privateplacements.html
 
 ## What are restricted securities?
 From: https://www.sec.gov/smallbusiness/exemptofferings/faq
