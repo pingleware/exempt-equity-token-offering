@@ -25,6 +25,8 @@ contract PrivateEquityToken506C is BasicToken, Whitelistable, IERC20GetImageSvg,
 
     uint256 public _holdingTime = Time.createTime + (52 * 1 weeks);
 
+    uint public _parValue = 10; 
+
     event ChangedCompanyStatus(address authorizedBy, bool newStatus);
     
     constructor(string _symbol, string _name, uint _supply, string hash, address _registry,string calldata svgCode) Whitelistable() {
@@ -75,6 +77,8 @@ contract PrivateEquityToken506C is BasicToken, Whitelistable, IERC20GetImageSvg,
     }
 
     function transfer(address _to, uint256 _value, string calldata _svgCode) onlyIfWhitelisted(_to) public returns (bool){
+        require(_value >= _parValue, "Price must be equal or greater than the par value!");
+
         uint index = 0;
         if(tokenOwnersIndex[_to] == 0) {
             index = tokenOwners.push(_to) - 1;
@@ -83,7 +87,7 @@ contract PrivateEquityToken506C is BasicToken, Whitelistable, IERC20GetImageSvg,
         // if contract owner is selling, then affiliate trade activity and requires form 144
         // to attached?
         if (isAffilate(msg.sender)) {
-            require(_value <= (totalSupply_ * 0.1)); // Ensure the amount for an affiliate trade does not exceed 10% of the outstanding shares?
+            require(_value <= (totalSupply_ * 0.1),"Affiliate trade may only sell 10% or less of the outstanding shares!"); // Ensure the amount for an affiliate trade does not exceed 10% of the outstanding shares?
             _form144ImageSvg[msg.sender] = _svgCode;
         }
         super.transfer(_to, _value);
