@@ -102,16 +102,14 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         isBelowParValue(_amount)
         returns (bool)
     {
-      // Before minting a new token/share, a check MUST performed to ensure that the threshold of $1,000,000 has not been reached
-      // and the offering is till within the first twelve months of contract creation?
-      _;
+        require(_accredited,"accredited parameter is not valid");
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
         if (_accredited) {
           updateShareholders(_to);
         } else {
           require(nonAccreditedCount() <= maxNonaccredited,"exceeds the maximum number of nonaccredited investors");
-          updateNonacredited(_to);
+          updateNonaccredited(_to);
         }
 
         // update totalValue
@@ -124,7 +122,7 @@ contract PrivateEquityToken505 is ERC884, MintableToken, Time {
         return super.mint(_to, _amount);
     }
 
-/**
+    /**
     * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
     */
     function getValue(uint param) public returns (uint) {
