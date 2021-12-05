@@ -2,12 +2,12 @@ pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./IdentityRegistry.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./token/ERC884/ERC884.sol";
 import "./Whitelistable.sol";
 import "./IERC20GetImageSvg.sol";
 import "./Time.sol";
 
-contract PrivateEquityToken506C is BasicToken, Whitelistable, IERC20GetImageSvg, Time {
+contract PrivateEquityToken506C is ERC884, Whitelistable, IERC20GetImageSvg, Time {
 
     string public symbol;
     string public name;
