@@ -41,6 +41,8 @@ contract PrivateEquityToken504 is ERC884, MintableToken, Time {
 
     bool private restricted = true;
 
+    uint private year = 52 weeks;
+
     constructor(string _symbol, string _name, uint _supply, string hash, address _registry,string calldata svgCode) {
       symbol = _symbol;
       name = _name;
@@ -72,7 +74,7 @@ contract PrivateEquityToken504 is ERC884, MintableToken, Time {
     }
 
     modifier isPriceBelowParValue(uint amount) {
-      require(amount > parValue, "amount is below par value");
+      require(amount >= parValue, "amount is below par value");
     }
 
     modifier isRestrictedSecurity() {
@@ -82,7 +84,7 @@ contract PrivateEquityToken504 is ERC884, MintableToken, Time {
     modifier hasHoldingTimeElapse(address addr) {
       for ( i = 0; i < transactions.length; i++ ) {
         if (transactions[i][0] == addr) {
-          require(transactions[i][2] > (Time.currentTime * 52 weeks),"minimum holding has not elapsed");
+          require(transactions[i][2] > (Time.currentTime * year),"minimum holding has not elapsed");
         }
       }
     }
@@ -99,7 +101,7 @@ contract PrivateEquityToken504 is ERC884, MintableToken, Time {
         canMint
         isVerifiedAddress(_to)
         isOfferingExpired()
-        isBelowParVale(_amount)
+        isPriceBelowParValue(_amount)
         returns (bool)
     {
       // Before minting a new token/share, a check MUST performed to ensure that the threshold of $1,000,000 has not been reached
