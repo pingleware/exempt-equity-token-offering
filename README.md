@@ -133,6 +133,7 @@ Performing the following searches reveal other open source implementations,
 
     https://github.com/search?q=equity+token
     https://github.com/search?q=security+token+offering
+    https://github.com/JincorTech/ico
 
 IMPORTANT: a quick review of existing solutions reveal they are not in compliance with the restricted securities provision of Rule 506(c), and hence could result in legal ramifications? (See restricted securities above)
 

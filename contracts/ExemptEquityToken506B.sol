@@ -1,4 +1,5 @@
-pragma solidity ^0.8.10;
+// SPDX-License-Identifier: CC-BY-4.0
+pragma solidity ^0.5.11;
 
 /**
  * Rule 506(b)
@@ -26,112 +27,158 @@ pragma solidity ^0.8.10;
  * after the first sale of securities in the offering. Although the Securities Act provides a federal preemption from state registration and qualification
  * under Rule 506(b), the states still have authority to require notice filings and collect state fees.
  */
+import '@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol';
+import './token/ERC884.sol';
 
-contract ExemptEquityToken506B is ERC884, MintableToken, Time {
-    string public symbol;
-    string public name;
+contract ExemptEquityToken506B is ERC884, ERC20Mintable {
+    string public constant name = "Rule 506(b) Token";
+    string public constant symbol = "TOKEN.506B";
+    uint8 public constant decimals = 0;
+
+    uint public constant INITIAL_SUPPLY = 100000 * 1 ether;
 
     bytes32 constant private ZERO_BYTES = bytes32(0);
     address constant private ZERO_ADDRESS = address(0);
 
-    uint public decimals = 0;
 
     mapping(address => bytes32) private verified;
     mapping(address => address) private cancellations;
     mapping(address => uint256) private holderIndices;
-    mapping(address => uint256) private transactions;
+    mapping(address => uint256) public  balances;
+
+    struct Transaction {
+        address addr;
+        uint256 amount;
+        uint256 time;
+    }
+
+    mapping(address => Transaction[]) public transactions;
+
+    address private owner;
 
     address[] private shareholders;
-    address[] private nonaccredited_shareholders;
+    address[] private shareholders_nonacredited;
+    address[] private shareholders_affiliate;
 
-    uint256 constant public creationTime = Time.createTime; // The contract creation time
 
-    uint constant public parValue = 5;
-    unit constant public maxNonaccredited = 35;
-    uint private totalValue = 0;
+    bool internal active = false;
+    uint256 private start_timestamp;
+    event ExemptOffering(address indexed from,string status, uint256 value);
+    event Bought(uint value);
+    event Sold(uint value);
+
+    uint constant public parValue = 10;
+    uint256 constant public totalValueMax = 5000000;
+    uint constant public maxNonaccredited = 35;
+    uint256 private totalValue = 0;
 
     bool private restricted = true;
 
-    constructor(string _symbol, string _name, uint _supply) {
-      symbol = _symbol;
-      name = _name;
-      totalSupply_ = _supply;
+    constructor() public {
+        owner = msg.sender;
+        addMinter(owner);
+        _mint(owner, INITIAL_SUPPLY);
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "access denied");
+        _;
+    }
+
+    modifier canMint() {
+        require(isMinter(msg.sender),"access denied");
+        _;
+    }
+
+    modifier isActive() {
+        require(active, "exempt offering is not active");
+        _;
     }
 
     modifier isVerifiedAddress(address addr) {
-        require(verified[addr] != ZERO_BYTES, "address cannot be empty?");
+        require(verified[addr] != ZERO_BYTES, "");
         _;
     }
 
     modifier isShareholder(address addr) {
-        require(holderIndices[addr] != 0, "address cannot be empty?");
+        require(holderIndices[addr] != 0, "");
         _;
     }
 
     modifier isNotShareholder(address addr) {
-        require(holderIndices[addr] == 0, "address cannot be empty?");
+        require(holderIndices[addr] == 0, "");
         _;
     }
 
     modifier isNotCancelled(address addr) {
-        require(cancellations[addr] == ZERO_ADDRESS, "address cannot be empty?");
+        require(cancellations[addr] == ZERO_ADDRESS, "");
         _;
     }
 
     modifier isPriceBelowParValue(uint amount) {
       require(amount > parValue, "amount is below par value");
+      _;
     }
 
     modifier isRestrictedSecurity() {
       require(restricted != false, "security is restricted");
+      _;
     }
 
-    modifier hasHoldingTimeElapse(address addr) {
-      for ( i = 0; i < transactions.length; i++ ) {
-        if (transactions[i][0] == addr) {
-          require(transactions[i][2] > (Time.currentTime * 52 weeks),"minimum holding has not elapsed");
-        }
-      }
+    modifier isMaximumOffering(uint256 amount) {
+        require(totalValue + amount < totalValueMax, "maximum offering has been reached");
+        _;
     }
 
     /**
      * As each token is minted it is added to the shareholders array.
      * @param _to The address that will receive the minted tokens.
      * @param _amount The amount of tokens to mint.
-     * @param _accredited If investor is an accredited investor (true) or non-accredited investor (false)
      * @return A boolean that indicates if the operation was successful.
      */
-    function mint(address _to, uint256 _amount, bool _accredited)
+    function mint(address _to, uint256 _amount)
         public
+        isActive
         onlyOwner
         canMint
         isVerifiedAddress(_to)
-        isBelowParValue(_amount)
+        isPriceBelowParValue(_amount)
+        isMaximumOffering(_amount)
         returns (bool)
     {
-        require(_accredited,"accredited parameter is not valid");
-        // if the address does not already own share then
-        // add the address to the shareholders array and record the index.
-        if (_accredited) {
-          updateShareholders(_to);
-        } else {
-          require(nonAccreditedCount() <= maxNonaccredited,"exceeds the maximum number of nonaccredited investors");
-          updateNonaccredited(_to);
-        }
-
-        // update totalValue
-        totalValue += _amount;
-
-        transactions.push([_to,_amount,Time.currentTime]);
-
+        Transaction memory trans = Transaction(_to, _amount, now);
+        transactions[_to].push(trans);
         return super.mint(_to, _amount);
     }
 
-/**
-    * From: https://ethereum.stackexchange.com/questions/11545/is-it-possible-to-access-storage-history-from-a-contract-in-solidity
-    */
-    function getValue(uint param) public returns (uint) {
-        return totalValue;
+    function toggleExemptOffering(uint256 timestamp, bool _active)
+        public
+        onlyOwner
+    {
+        start_timestamp = timestamp;
+        active = _active;
+
+        if (active) {
+            emit ExemptOffering(msg.sender, string(abi.encodePacked(name, " has started")), timestamp);
+        } else {
+            emit ExemptOffering(msg.sender, string(abi.encodePacked(name, " has stopped")), timestamp);
+        }
+    }
+
+    function getTransactions(address addr) public view onlyOwner returns (string memory) {
+        string memory output = "";
+        for (uint i = 0; i < transactions[addr].length; i++) {
+            output = string(
+                abi.encodePacked(output, "[", transactions[addr][i].addr, ",", transactions[addr][i].amount, ",",  transactions[addr][i].time, "]")
+            );
+        }
+        return output;
+    }
+
+    function getTransactionByIndex(address addr, uint index) public view onlyOwner returns (string memory) {
+        return string(abi.encodePacked(
+            "[", transactions[addr][index].addr, ",", transactions[addr][index].amount, ",", transactions[addr][index].time, "]"
+        ));
     }
 
     /**
@@ -144,17 +191,8 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
         view
         returns (uint)
     {
-        return shareholders.length + nonaccredited_shareholders.length;
+        return shareholders.length;
     }
-
-    function nonAccreditedCount() 
-        public
-        onlyOwner
-        view
-        return (uint)
-      {
-        return nonaccredited_shareholders.length;
-      }
 
     /**
      *  By counting the number of token holders using `holderCount`
@@ -169,7 +207,7 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
         view
         returns (address)
     {
-        require(index < shareholders.length, "out of bounds");
+        require(index < shareholders.length, "");
         return shareholders[index];
     }
 
@@ -204,7 +242,7 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
         public
         onlyOwner
     {
-        require(balances[addr] == 0, "");
+        require(addr.balance == 0, "account balance is not zero");
         if (verified[addr] != ZERO_BYTES) {
             verified[addr] = ZERO_BYTES;
             emit VerifiedAddressRemoved(addr, msg.sender);
@@ -246,6 +284,7 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
      */
     function cancelAndReissue(address original, address replacement)
         public
+        isActive
         onlyOwner
         isShareholder(original)
         isNotShareholder(replacement)
@@ -266,20 +305,23 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
 
     /**
      *  The `transfer` function MUST NOT allow transfers to addresses that
-     *  verification is NOT needed for 504 rule.
+     *  have not been verified and added to the contract.
      *  If the `to` address is not currently a shareholder then it MUST become one.
      *  If the transfer will reduce `msg.sender`'s balance to 0 then that address
      *  MUST be removed from the list of shareholders.
      */
     function transfer(address to, uint256 value)
         public
-        isRestrictedSecurity()
-        isHolder(msg.sender)
-        hasHoldingTimeElapse(msg.sender)
+        isActive
+        isVerifiedAddress(to)
+        isPriceBelowParValue(value)
         returns (bool)
     {
-        updateShareholders(to);
         pruneShareholders(msg.sender, value);
+        Transaction memory trans = Transaction(to, value, now);
+        transactions[to].push(trans);
+        trans = Transaction(msg.sender, uint256(-1) * value, now);
+        transactions[msg.sender].push(trans);
         return super.transfer(to, value);
     }
 
@@ -292,13 +334,16 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
      */
     function transferFrom(address from, address to, uint256 value)
         public
-        isRestrictedSecurity()
-        isHolder(from)
-        hasHoldingTimeElapse(from)
+        isActive
+        isVerifiedAddress(to)
+        isPriceBelowParValue(value)
         returns (bool)
     {
-        updateShareholders(to);
         pruneShareholders(from, value);
+        Transaction memory trans = Transaction(to, value, now);
+        transactions[to].push(trans);
+        trans = Transaction(from, uint256(-1) * value, now);
+        transactions[from].push(trans);
         return super.transferFrom(from, to, value);
     }
 
@@ -405,13 +450,22 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
         }
     }
 
-    function updateNonaccredited(address addr)
-        internal
+    function addShareholder(address addr, uint level)
+        public
+        onlyOwner
     {
         if (holderIndices[addr] == 0) {
-            holderIndices[addr] = unaccredited_shareholders.push(addr);
+            if (level == 0) {
+                require(shareholders_nonacredited.length < maxNonaccredited, "will exceed the maximum number of non-accredited investors");
+                holderIndices[addr] = shareholders_nonacredited.push(addr);
+            } else if (level == 1) {
+                holderIndices[addr] = shareholders.push(addr);
+            } else if (level == 2) {
+                holderIndices[addr] = shareholders_affiliate.push(addr);
+            }
         }
     }
+
 
     /**
      *  If the address is in the `shareholders` array and the forthcoming
@@ -423,7 +477,7 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
     function pruneShareholders(address addr, uint256 value)
         internal
     {
-        uint256 balance = balances[addr] - value;
+        uint256 balance = addr.balance - value;
         if (balance > 0) {
             return;
         }
@@ -439,5 +493,37 @@ contract ExemptEquityToken506B is ERC884, MintableToken, Time {
         shareholders.length--;
         // and zero out the index for addr
         holderIndices[addr] = 0;
+    }
+
+    function buy()
+        public
+        payable
+        isActive
+        isMaximumOffering(msg.value)
+    {
+        uint256 amountTobuy = msg.value;
+        uint256 dexBalance = balanceOf(address(this));
+        require(amountTobuy > 0, "You need to send some ether");
+        require(amountTobuy <= dexBalance, "Not enough tokens in the reserve");
+        Transaction memory trans = Transaction(msg.sender, amountTobuy, now);
+        transactions[msg.sender].push(trans);
+        transfer(msg.sender, amountTobuy);
+        emit Bought(amountTobuy);
+    }
+
+    function sell(uint256 amount)
+        public
+        payable
+        isActive
+        isVerifiedAddress(msg.sender)
+    {
+        require(amount > 0, "You need to sell at least some tokens");
+        uint256 allowance = allowance(msg.sender, address(this));
+        require(allowance >= amount, "Check the token allowance");
+        transferFrom(msg.sender, address(this), amount);
+        Transaction memory trans = Transaction(msg.sender, amount, now);
+        transactions[msg.sender].push(trans);
+        msg.sender.transfer(amount);
+        emit Sold(amount);
     }
 }

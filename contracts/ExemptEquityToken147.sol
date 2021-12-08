@@ -1,4 +1,5 @@
-pragma solidity ^0.8.10;
+// SPDX-License-Identifier: CC-BY-4.0
+pragma solidity ^0.5.11;
 
 /**
  * Intrastate: Rule 147
@@ -44,73 +45,121 @@ pragma solidity ^0.8.10;
 * may be offered to the residents of both the state of Delaware and Florida.
 */
 
+import '@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol';
+import './token/ERC884.sol';
+import "./token/Time.sol";
 
-import "./token/ERC884/ERC884.sol";
-import "./Time.sol";
+contract ExemptEquityToken147  is ERC884, ERC20Mintable {
+    string public constant name = "Rule 147 Token";
+    string public constant symbol = "TOKEN.147";
+    uint8 public constant decimals = 0;
 
-contract ExemptEquityToken147 is ERC884, MintableToken, Time {
-    string public symbol;
-    string public name;
+    uint public constant INITIAL_SUPPLY = 100000 * 1 ether;
 
     bytes32 constant private ZERO_BYTES = bytes32(0);
     address constant private ZERO_ADDRESS = address(0);
 
-    uint public decimals = 0;
-
     mapping(address => bytes32) private verified;
     mapping(address => address) private cancellations;
     mapping(address => uint256) private holderIndices;
-    mapping(address => uint256) private transactions;
+    mapping (address => uint256) public balances;
+
+    struct Transaction {
+        address addr;
+        uint256 amount;
+        uint256 time;
+    }
+
+    mapping(address => Transaction[]) public transactions;
+
+    address private owner;
 
     address[] private shareholders;
 
-    uint256 constant public creationTime = Time.createTime; // The contract creation time
+    bool internal active = false;
+    uint256 private start_timestamp;
+    event ExemptOffering(address indexed from,string status, uint256 value);
 
-    uint constant public parValue = 10;
-    unit constant public totalValueMax = 1000000;
+    uint constant public parValue = 5 * 0.001 ether;
+    uint constant public totalValueMax = 100000 * parValue;
     uint private totalValue = 0;
+
+    uint256 private contract_creation; // The contract creation time
 
     bool private restricted = true;
 
     uint private year = 52 weeks;
     uint private sixmonths = 26 weeks;
 
-    constructor(string _symbol, string _name, uint _supply) {
-      symbol = _symbol;
-      name = _name;
-      totalSupply_ = _supply;
+    event Bought(uint value);
+    event Sold(uint value);
+
+    constructor() public {
+        contract_creation = now;
+        owner = msg.sender;
+        addMinter(owner);
+        _mint(owner, INITIAL_SUPPLY);
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "access denied");
+        _;
+    }
+
+    modifier canMint() {
+        require(isMinter(msg.sender),"access denied");
+        _;
+    }
+
+    modifier isActive() {
+        require(active, "exempt offering is not active");
+        _;
     }
 
     modifier isVerifiedAddress(address addr) {
-        require(verified[addr] != ZERO_BYTES, "address cannot be empty?");
+        require(verified[addr] != ZERO_BYTES, "");
         _;
     }
 
     modifier isShareholder(address addr) {
-        require(holderIndices[addr] != 0, "address cannot be empty?");
+        require(holderIndices[addr] != 0, "");
         _;
     }
 
     modifier isNotShareholder(address addr) {
-        require(holderIndices[addr] == 0, "address cannot be empty?");
+        require(holderIndices[addr] == 0, "");
         _;
     }
 
     modifier isNotCancelled(address addr) {
-        require(cancellations[addr] == ZERO_ADDRESS, "address cannot be empty?");
+        require(cancellations[addr] == ZERO_ADDRESS, "");
         _;
     }
 
     modifier isOfferingExpired() {
-      require(Time.currentTime < (creationTime * sixmonths),"offering has expired!");
+      require(now < (contract_creation + sixmonths),"offering has expired!");
+      _;
     }
 
     modifier isPriceBelowParValue(uint amount) {
       require(amount > parValue, "amount is below par value");
+      _;
     }
 
     modifier isRestrictedSecurity() {
       require(restricted != false, "security is restricted");
+      _;
+    }
+
+    modifier isHoldingPeriodOver(address addr) {
+        bool over = false;
+        for (uint i = 0; i < transactions[addr].length; i++) {
+            if (transactions[addr][i].time > (transactions[addr][i].time + sixmonths)) {
+                over = true;
+            }
+        }
+        require (over, "holding period is not over");
+        _;
     }
 
     /**
@@ -121,9 +170,9 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
      */
     function mint(address _to, uint256 _amount)
         public
+        isActive
         onlyOwner
         canMint
-        isOfferingExpired()
         isVerifiedAddress(_to)
         isPriceBelowParValue(_amount)
         returns (bool)
@@ -131,7 +180,39 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
         // if the address does not already own share then
         // add the address to the shareholders array and record the index.
         updateShareholders(_to);
+        Transaction memory trans = Transaction(_to, _amount, now);
+        transactions[_to].push(trans);
         return super.mint(_to, _amount);
+    }
+
+    function toggleExemptOffering(uint256 timestamp, bool _active)
+        public
+        onlyOwner
+    {
+        start_timestamp = timestamp;
+        active = _active;
+
+        if (active) {
+            emit ExemptOffering(msg.sender, string(abi.encodePacked(name, " has started")), timestamp);
+        } else {
+            emit ExemptOffering(msg.sender, string(abi.encodePacked(name, " has stopped")), timestamp);
+        }
+    }
+
+    function getTransactions(address addr) public view onlyOwner returns (string memory) {
+        string memory output = "";
+        for (uint i = 0; i < transactions[addr].length; i++) {
+            output = string(
+                abi.encodePacked(output, "[", transactions[addr][i].addr, ",", transactions[addr][i].amount, ",",  transactions[addr][i].time, "]")
+            );
+        }
+        return output;
+    }
+
+    function getTransactionByIndex(address addr, uint index) public view onlyOwner returns (string memory) {
+        return string(abi.encodePacked(
+            "[", transactions[addr][index].addr, ",", transactions[addr][index].amount, ",", transactions[addr][index].time, "]"
+        ));
     }
 
     /**
@@ -160,7 +241,7 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
         view
         returns (address)
     {
-        require(index < shareholders.length,"out of bounds");
+        require(index < shareholders.length, "");
         return shareholders[index];
     }
 
@@ -177,9 +258,9 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
         onlyOwner
         isNotCancelled(addr)
     {
-        require(addr != ZERO_ADDRESS,"missing address");
-        require(hash != ZERO_BYTES,"missing address");
-        require(verified[addr] == ZERO_BYTES,"verified address exists");
+        require(addr != ZERO_ADDRESS, "");
+        require(hash != ZERO_BYTES, "");
+        require(verified[addr] == ZERO_BYTES, "");
         verified[addr] = hash;
         emit VerifiedAddressAdded(addr, hash, msg.sender);
     }
@@ -195,7 +276,7 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
         public
         onlyOwner
     {
-        require(balances[addr] == 0,"verified address has a balance");
+        require(addr.balance == 0, "account balance is not zero");
         if (verified[addr] != ZERO_BYTES) {
             verified[addr] = ZERO_BYTES;
             emit VerifiedAddressRemoved(addr, msg.sender);
@@ -217,7 +298,7 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
         onlyOwner
         isVerifiedAddress(addr)
     {
-        require(hash != ZERO_BYTES,"missing hash");
+        require(hash != ZERO_BYTES, "");
         bytes32 oldHash = verified[addr];
         if (oldHash != hash) {
             verified[addr] = hash;
@@ -237,6 +318,7 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
      */
     function cancelAndReissue(address original, address replacement)
         public
+        isActive
         onlyOwner
         isShareholder(original)
         isNotShareholder(replacement)
@@ -264,12 +346,18 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
      */
     function transfer(address to, uint256 value)
         public
+        isActive
         isVerifiedAddress(to)
-        isRestrictedSecurity()
+        isHoldingPeriodOver(to)
         returns (bool)
     {
         updateShareholders(to);
         pruneShareholders(msg.sender, value);
+        Transaction memory trans = Transaction(to, value, now);
+        transactions[to].push(trans);
+        trans = Transaction(msg.sender, uint256(-1) * value, now);
+        transactions[msg.sender].push(trans);
+
         return super.transfer(to, value);
     }
 
@@ -282,12 +370,18 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
      */
     function transferFrom(address from, address to, uint256 value)
         public
+        isActive
         isVerifiedAddress(to)
-        isRestrictedSecurity()
+        isHoldingPeriodOver(from)
         returns (bool)
     {
         updateShareholders(to);
         pruneShareholders(from, value);
+        Transaction memory trans = Transaction(to, value, now);
+        transactions[to].push(trans);
+        trans = Transaction(from, uint256(-1) * value, now);
+        transactions[from].push(trans);
+
         return super.transferFrom(from, to, value);
     }
 
@@ -404,7 +498,7 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
     function pruneShareholders(address addr, uint256 value)
         internal
     {
-        uint256 balance = balances[addr] - value;
+        uint256 balance = addr.balance - value;
         if (balance > 0) {
             return;
         }
@@ -421,4 +515,38 @@ contract ExemptEquityToken147 is ERC884, MintableToken, Time {
         // and zero out the index for addr
         holderIndices[addr] = 0;
     }
+
+    function buy()
+        public
+        payable
+        isActive
+        isVerifiedAddress(msg.sender)
+    {
+        uint256 amountTobuy = msg.value;
+        uint256 dexBalance = balanceOf(address(this));
+        require(amountTobuy > 0, "You need to send some ether");
+        require(amountTobuy <= dexBalance, "Not enough tokens in the reserve");
+        Transaction memory trans = Transaction(msg.sender, amountTobuy, now);
+        transactions[msg.sender].push(trans);
+        transfer(msg.sender, amountTobuy);
+        emit Bought(amountTobuy);
+    }
+
+    function sell(uint256 amount)
+        public
+        payable
+        isActive
+        isVerifiedAddress(msg.sender)
+        isHoldingPeriodOver(msg.sender)
+    {
+        require(amount > 0, "You need to sell at least some tokens");
+        uint256 allowance = allowance(msg.sender, address(this));
+        require(allowance >= amount, "Check the token allowance");
+        transferFrom(msg.sender, address(this), amount);
+        Transaction memory trans = Transaction(msg.sender, amount, now);
+        transactions[msg.sender].push(trans);
+        msg.sender.transfer(amount);
+        emit Sold(amount);
+    }
+
 }

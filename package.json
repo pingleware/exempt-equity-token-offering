@@ -7,19 +7,31 @@
     "test": "test"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "2.5.0"
+    "@openzeppelin/contracts": "2.5.0",
+    "ganache-cli": "^6.1.8",
+    "web3": "^1.6.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pingleware/private-placement.git"
+    "url": "git+https://github.com/pingleware/exempt-equity-token-offering.git"
   },
-  "author": "PressPage Entertainment Inc DBA PINGLEWARE",
+  "author": {
+    "name": "PressPage Entertainment Inc"
+  },
+  "maintainers": [
+    {
+      "name": "PressPage Entertainment Inc DBA PINGLEWARE"
+    },
+    {
+      "name": "Patrick O. Ingle"
+    }
+  ],
   "license": "CC-BY-4.0",
   "bugs": {
-    "url": "https://github.com/pingleware/private-placement/issues"
+    "url": "https://github.com/pingleware/exempt-equity-token-offering/issues"
   },
-  "homepage": "https://github.com/pingleware/private-placement#readme"
+  "homepage": "https://github.com/pingleware/exempt-equity-token-offering#readme"
 }
