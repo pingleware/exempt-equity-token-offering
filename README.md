@@ -1,3 +1,5 @@
+THERE IS A LOT OF INFORMATION DISCLOSED ON THIS PAGE. PLEASE SEEK THE ADVICE OF A QUALIFIED LICENSED PROFESSIONAL TO ANSWER YOUR QUESTIONS.
+
 # Exempt Equity Offering
 (includes private placement offerings)
 
@@ -22,6 +24,8 @@ See https://www.sec.gov/smallbusiness/exemptofferings/exemptofferingschart for a
 JUMPSTART OUR BUSINESS STARTUPS ACT at https://www.congress.gov/112/plaws/publ106/PLAW-112publ106.pdf
 
 A good source for the Private Placement required documents is at https://content.next.westlaw.com/Document/I3f10b79573f411e38578f7ccc38dcbee/View/FullText.html?contextData=(sc.Default) 
+
+SEC Strategic Hub for Innovation and Financial Technology (FinHub) at https://www.sec.gov/finhub
 
 ## General Solicitation - Rule 506(c)
 From https://www.sec.gov/smallbusiness/exemptofferings/rule506c
