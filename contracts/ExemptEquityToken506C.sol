@@ -17,48 +17,6 @@ pragma solidity ^0.5.11;
  * Rule 506(c), the states still have authority to require notice filings and collect state fees.
  */
 
-    /**
-     * CUSIP numbers are unique identifiers for public and private offerings (Rule 144)
-     * An offering with a CUSIP number adds additional validity and legitimacy to the offering,
-     * but risks are still determined by the investor.
-     * To obtain a CUSIP number, visit http://cusip.com/apply
-     *
-     * A CUSIP number is needed for each offering, especially when Rule 144 is applicable?
-     *
-     * To apply for a CUSIP number for this offering, there are prerequisites:
-     * - Must have a transfer agent
-     * - Must have an underwriter
-     * - Must have an attorney that prepared the Private Placement Memorandum (PPM)
-     * - Cost is $168 and requires a credit card
-     *
-     * Transfer Agents:
-     *   securitize.io, templum.com; however you can register with the SEC using Form TA-1 to  as a transfer agent solely
-     *   for its own securities and/or securities of an affiliate(s); https://www.sec.gov/about/forms/formta-1.pdf
-     *   More about Transfer Agent registration with the SEC at https://www.sec.gov/divisions/marketreg/mrtransfer.shtml
-     *
-     * Transfer Agent Responsibilities:
-     *   Every year, the TA must file Form TA-1 [https://www.sec.gov/about/forms/formta-2.pdf] (via EDGAR) for year ending on December 31 by March 31.
-     *   The BestBooks Accounting Application Framework at https://wordpress.org/plugins/bestbooks has SEC reporting features built-in.
-     *
-     * FINS number required to be registered as a Transfer Agent, https://www.dtcc.com/~/media/Files/Downloads/Settlement-Asset-Services/agent%20services/FINS%20Form.pdf
-     *
-     * FDIC https://www.fdic.gov/regulations/examinations/trustmanual/section_11/rta_manualregistrationoftransferagents.html
-     *
-     * Underwriter:
-     * -----------
-     * Search on "EXEMPT OFFERING UNDERWRITING AGREEMENT"
-     *
-     * Recommended Attorney:
-     * --------------------
-     *      Darin Magnum, Esq.
-     *      Phone:  (281) 203-0194
-     *      Website: ThePPMAttorney.com
-     *
-     * Mr. Magnum has not given his endorsement.
-     *
-     * Mr. Magnum is very knowledgeable and experienced of the Private Placement Offering landscape,
-     * see his videos at https://www.youtube.com/watch?v=DWYZ81EZ6Yk
-     */
 
 import '@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol';
 import './token/ERC884.sol';
