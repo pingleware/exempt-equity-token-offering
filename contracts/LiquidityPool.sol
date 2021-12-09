@@ -27,12 +27,22 @@ contract LiquidityPool {
 
   mapping(uint => Transaction[]) private transactions;
 
+  struct Investor {
+    address addr;
+    uint256 time;
+    uint amount;
+  }
+
+  mapping(address => Investor[]) private investors;
+
   constructor(uint tokens, uint cash, uint _parValue) public {
     owner = msg.sender;
     parValue = _parValue;
     equityToken501c = tokens;
     investorCash = cash;
     k = tokens * cash;
+    Investor memory investor = Investor(owner, now, cash);
+    investors[owner].push(investor);
   }
 
   modifier onlyOwner() {
@@ -47,6 +57,13 @@ contract LiquidityPool {
     require((equityToken501c + tokens) * (investorCash + cash) == k,"liquidity pool is out of balance");
     equityToken501c += tokens;
     investorCash += cash;
+  }
+
+  function invest(address invaddr, uint cash) public payable onlyOwner {
+    investorCash += cash;
+    Investor memory investor = Investor(invaddr, now, cash);
+    investors[invaddr].push(investor);
+    k = equityToken501c * investorCash;
   }
 
   function getTransactions() public view onlyOwner returns(string memory) {
