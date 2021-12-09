@@ -104,7 +104,10 @@ UNLESS THE FOUNDER IN THE ABOVE SCENARIO COMMITS TO FULL DISCLOSURE INCLUDE VOLU
 ### Alternative Trading Systems
 Implementing the 0x protocol in the Exempt Equity Offering token contract can provide a private DEX or decentralized exchange for accredited investors to trade their holdings after the expiration of the lockout period. A good explanation for implementing a DEX at https://medium.com/hackernoon/how-to-integrate-0x-zrx-protocol-to-setup-your-own-decentralized-exchange-dex-584daea7a8f0. See https://www.investor.gov/introduction-investing/investing-basics/glossary/alternative-trading-systems-atss.
 
-17 CFR § 242.301 - Requirements for alternative trading systems at https://www.law.cornell.edu/cfr/text/17/242.301 
+17 CFR § 242.301 - Requirements for alternative trading systems at https://www.law.cornell.edu/cfr/text/17/242.301
+
+The latest list of SEC Alternative Trading Systems (ATS) is at https://www.sec.gov/foia/docs/atslist.htm
+
 
 #### § 242.301 Requirements for alternative trading systems.
 (a) Scope of section. An alternative trading system shall comply with the requirements in paragraph (b) of this section, unless such alternative trading system:

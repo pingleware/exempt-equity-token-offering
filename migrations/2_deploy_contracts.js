@@ -13,7 +13,11 @@ var ExemptEquityOfferingAT1 = artifacts.require('./ExemptEquityTokenAT1');
 var ExemptEquityOfferingAT2 = artifacts.require('./ExemptEquityTokenAT2');
 var ExemptEquityOfferingRegS = artifacts.require('./ExemptEquityTokenRegS');
 
-var IdentityRegistry = artifacts.require('./IdentityRegistry')
+const Owned = artifacts.require("./Owned.sol");
+const Exchange = artifacts.require("./Exchange.sol");
+
+
+var IdentityRegistry = artifacts.require('./IdentityRegistry');
 
 module.exports = function(deployer) {
     deployer.deploy(IdentityRegistry).then((A) => {
@@ -27,5 +31,7 @@ module.exports = function(deployer) {
         deployer.deploy(ExemptEquityOfferingAT1);
         deployer.deploy(ExemptEquityOfferingAT2);
         deployer.deploy(ExemptEquityOfferingRegS);
+        deployer.deploy(Owned);
+        deployer.deploy(Exchange);
     })
 }
