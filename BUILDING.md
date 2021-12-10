@@ -1,7 +1,7 @@
 # Creating a Smart Contract 
 To begin creating a smart contract you will need the following tools,
 
-    npx truffle init
+    npx truffle init (or truffle init)
     npm init -y
 
 # Developing with Truffle Develop
@@ -28,3 +28,9 @@ a new files is created in the contracts directory
 
 # Developing with Ganache-UI
 During the development of this Private Placement equity token, the Ganache-UI private blockchain will be used.
+
+# Ganache-CLI
+To launch from the command line,
+
+    ganache-cli --port="8545" --mnemonic "copy obey episode awake damp vacant protect hold wish primary travel shy" --verbose --networkId=3 --gasLimit=7984452 --gasPrice=2000000000;
+
