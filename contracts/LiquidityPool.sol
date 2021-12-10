@@ -4,6 +4,7 @@ pragma solidity >=0.4.22 <0.9.0;
 // Implementation of a Constant Product Automated Market Maker
 
 // Other liquidiuty pool contracts: https://github.com/search?p=2&q=liquidity+pool+contract&type=Repositories
+// https://github.com/OCTIONOFFICIAL/liquiditypoolV2
 
 contract LiquidityPool {
 

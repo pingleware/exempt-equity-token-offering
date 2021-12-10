@@ -55,6 +55,16 @@ Every year, the TA must file Form TA-1 [https://www.sec.gov/about/forms/formta-2
     </embed>
 </object>
 
+#### Transfer Agents: Instructions for Sending Accountant's Reports and Notices of Corrective Action Pursuant to the Annual Study and Evaluation of Internal Accounting Control
+See https://www.sec.gov/about/offices/ocie/ta-instructions.htm
+
+Pursuant to Exchange Act Rule 17Ad-13, every registered transfer agent, except as provided in Rule 17Ad-13(d), must annually file with the Commission a report prepared by an independent accountant concerning the transfer agent's system of internal accounting control and related procedures for the transfer of record ownership and the safeguarding of related securities and funds. For purposes of this report, the objective of a transfer agent's system of internal accounting control for the transfer of record ownership and the safeguarding of related securities and funds should be to provide reasonable, but not absolute, assurance that securities and funds are safeguarded against loss from unauthorized use or disposition and that transfer agent activities are performed promptly and accurately. The accountant's report must state, among other things, whether the study and evaluation was made in accordance with generally accepted auditing standards and must describe any material inadequacies found by the accountant and any corrective action taken by the transfer agent. If the accountant's report describes any material inadequacy, Rule 17Ad-13(b) requires a transfer agent to notify the Commission in writing within sixty calendar days of any corrective action taken or proposed to be taken. While Rule 17Ad-13 provides general instructions for sending the report and notice to the Commission, these instructions are to provide more specific guidance. The accountant's report and corrective action notification should be directed to the attention of the U.S. Securities and Exchange Commission's Director of the Office of Compliance Inspections and Examinations, by care of Transfer Agent Accountant Report. Additional information regarding sending accountant's reports and corrective action notices is provided below.
+
+- First Class Mail: 100 F. Street, N.E., Mail Stop 7041, Attn: Transfer Agent Accountant Report, Washington D.C. 20549
+
+- Facsimile Transmission: (202) 772-9176
+
+- Email Transmission: TransferAgentAccountantReport@sec.gov
 
 FINS number required to be registered as a Transfer Agent,
 

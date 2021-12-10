@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: CC-BY-4.0
 pragma solidity >=0.4.22 <0.9.0;
 
+/**
+ * How to integrate 0x(ZRX) Protocol to setup your own Decentralized Exchange (DEX)
+ * see https://medium.com/hackernoon/how-to-integrate-0x-zrx-protocol-to-setup-your-own-decentralized-exchange-dex-584daea7a8f0
+ */
+
 import "./Owned.sol";
 import "./ExemptEquityToken506C.sol";
 
