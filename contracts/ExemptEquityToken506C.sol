@@ -36,6 +36,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
     mapping(address => address) private cancellations;
     mapping(address => uint256) private holderIndices;
     mapping(address => uint256) public  balances;
+    mapping(address => bool) private transferagents;
 
     struct Transaction {
         address addr;
@@ -49,6 +50,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
 
     address[] private shareholders;
 
+
     bool internal active = false;
     uint256 private start_timestamp;
     event ExemptOffering(address indexed from,string status, uint256 value);
@@ -58,8 +60,12 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
     event Bought(uint value);
     event Sold(uint value);
 
+    event TransferAgentAdded(address addr);
+    event TransferAgentRemoved(address addr);
+
     constructor() public {
         owner = msg.sender;
+        transferagents[owner] = true;
         addMinter(owner);
         _mint(owner, INITIAL_SUPPLY);
     }
@@ -110,6 +116,30 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
         _;
     }
 
+    modifier onlyTransferAgent() {
+        require(transferagents[msg.sender] == true, "access denied");
+        _;
+    }
+
+    function addTransferAgent(address addr)
+        public
+        onlyOwner
+    {
+        require(addr != ZERO_ADDRESS, "missing transfer agent address");
+        transferagents[addr] = true;
+        emit TransferAgentAdded(addr);
+    }
+
+    function removeTransferAgent(address addr)
+        public
+        onlyOwner
+    {
+        require(addr == ZERO_ADDRESS,"missing transfer agent address");
+        require(addr != owner,"cannot remove the owner");
+        transferagents[addr] = false;
+        emit TransferAgentRemoved(addr);
+    }
+
     /**
      * As each token is minted it is added to the shareholders array.
      * @param _to The address that will receive the minted tokens.
@@ -119,7 +149,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
     function mint(address _to, uint256 _amount)
         public
         isActive
-        onlyOwner
+        onlyTransferAgent
         canMint
         isVerifiedAddress(_to)
         returns (bool)
@@ -146,7 +176,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
         }
     }
 
-    function getTransactions(address addr) public view onlyOwner returns (string memory) {
+    function getTransactions(address addr) public view onlyTransferAgent returns (string memory) {
         string memory output = "";
         for (uint i = 0; i < transactions[addr].length; i++) {
             output = string(
@@ -156,7 +186,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
         return output;
     }
 
-    function getTransactionByIndex(address addr, uint index) public view onlyOwner returns (string memory) {
+    function getTransactionByIndex(address addr, uint index) public view onlyTransferAgent returns (string memory) {
         return string(abi.encodePacked(
             "[", transactions[addr][index].addr, ",", transactions[addr][index].amount, ",", transactions[addr][index].time, "]"
         ));
@@ -168,7 +198,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
      */
     function holderCount()
         public
-        onlyOwner
+        onlyTransferAgent
         view
         returns (uint)
     {
@@ -184,7 +214,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
      */
     function holderAt(uint256 index)
         public
-        onlyOwner
+        onlyTransferAgent
         view
         returns (address)
     {
@@ -202,7 +232,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
      */
     function addVerified(address addr, bytes32 hash)
         public
-        onlyOwner
+        onlyTransferAgent
         isNotCancelled(addr)
     {
         require(addr != ZERO_ADDRESS, "");
@@ -221,7 +251,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
      */
     function removeVerified(address addr)
         public
-        onlyOwner
+        onlyTransferAgent
     {
         require(addr.balance == 0, "account balance is not zero");
         if (verified[addr] != ZERO_BYTES) {
@@ -242,7 +272,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
      */
     function updateVerified(address addr, bytes32 hash)
         public
-        onlyOwner
+        onlyTransferAgent
         isVerifiedAddress(addr)
     {
         require(hash != ZERO_BYTES, "");
@@ -266,7 +296,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
     function cancelAndReissue(address original, address replacement)
         public
         isActive
-        onlyOwner
+        onlyTransferAgent
         isShareholder(original)
         isNotShareholder(replacement)
         isVerifiedAddress(replacement)
@@ -383,7 +413,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
     function isSuperseded(address addr)
         public
         view
-        onlyOwner
+        onlyTransferAgent
         returns (bool)
     {
         return cancellations[addr] != ZERO_ADDRESS;
@@ -399,7 +429,7 @@ contract ExemptEquityToken506C is ERC884, ERC20Mintable {
     function getCurrentFor(address addr)
         public
         view
-        onlyOwner
+        onlyTransferAgent
         returns (address)
     {
         return findCurrentFor(addr);

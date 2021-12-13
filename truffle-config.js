@@ -104,13 +104,13 @@ module.exports = {
   // $ truffle migrate --reset --compile-all
   //
   // db: {
-    // enabled: false,
-    // host: "127.0.0.1",
-    // adapter: {
-    //   name: "sqlite",
-    //   settings: {
-    //     directory: ".db"
-    //   }
-    // }
+  //   enabled: true,
+  //   host: "127.0.0.1",
+  //   adapter: {
+  //     name: "sqlite",
+  //     settings: {
+  //       directory: ".db"
+  //     }
+  //   }
   // }
 };
