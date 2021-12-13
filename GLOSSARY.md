@@ -66,7 +66,7 @@ The number of shares outstanding minus closely-held shares – a large number of
 When a company cancels shares, thus reducing the total available number of shares. This action is non-reversible.
 
 ## Treasury Shares
-When a company buys back shares from the investors.
+The number of shares that are held by the company. Treasury stock has no voting authority.
 
 ## Private Placement Memorandum
 Is like a prospectus for private equity offerings. If you have set a high a par value say $5 per share and allocated 100,000 shares for your private equity offering, the minimum valuation is $500,000. If your company does not have $500,000 in assets, you may wish to specify in your private placement memorandum "use of proceeds," a budget to acquired assets to increase total company net asset value above $500,000?
