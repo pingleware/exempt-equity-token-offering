@@ -25,11 +25,16 @@ In blockchain equity token transactions, the token or transaction ID or hash can
 
 For example, a new stock certificate could have a number in the format of,
 
-    CUSIP-TOKEN_TRANSACTION_HASH
+    CUSIP-TOKEN_TRANSACTION_HASH|INDEX
 
 For restricted securities, the stock certificates have a RESTRICTED image overlaid on the certtificate.
 
+For a blockchain offering, the investor name on the stock certificate is replaced with the investor wallet address. The transfer agent maintains the correlation with investor wallet address to investor personal identifying information off-chain as well as will create the stock certificate and attached an image to the transaction.
+
 ![Restricted Stock Certificate](assets/stockcertificate-restricted.png)
+*The stock certificate must use the ANSI format for stock certificates.
+
+An example of a Form D Preferred Stock Certificate is available at https://www.sec.gov/Archives/edgar/data/0001685040/000119312521336813/d229967dex31.htm
 
 ## Transfer Agents
 The following two services can act as a transfer agent: securitize.io, templum.com; 
@@ -45,6 +50,9 @@ However you can register with the SEC using Form TA-1 to  as a transfer agent so
 
 
 More about Transfer Agent registration with the SEC at https://www.sec.gov/divisions/marketreg/mrtransfer.shtml
+
+## Federal Register for Transfer Agents
+See https://www.federalregister.gov/documents/2015/12/31/2015-32755/transfer-agent-regulations
 
 ### Transfer Agent Responsibilities:
 Every year, the TA must file Form TA-1 [https://www.sec.gov/about/forms/formta-2.pdf] (via EDGAR) for year ending on December 31 by March 31. The BestBooks Accounting Application Framework at https://wordpress.org/plugins/bestbooks has SEC reporting features built-in.
@@ -90,3 +98,7 @@ Search on "EXEMPT OFFERING UNDERWRITING AGREEMENT"
 
 
 [![The 7 Critical Clauses Every Private Placement Memorandum Should Have](https://i.ytimg.com/vi/DWYZ81EZ6Yk/hqdefault.jpg)](https://www.youtube.com/watch?v=DWYZ81EZ6Yk)
+
+### What is an exempt offering document?
+From: https://www.ascentlawfirm.com/what-is-an-exempt-offering-document/
+
