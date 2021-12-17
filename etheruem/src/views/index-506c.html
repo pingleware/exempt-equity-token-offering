@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="shortcut icon" href="favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Exempt Equity Token Rule 506(c)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script language="javascript" type="text/javascript" src="./abi-506c.js"></script>
+  <script>
+    // this will be where our code will be
+  </script>
+</head>
+<body>
+  <h2 class="w3-green">Exempt Equity Token General Solicitation Rule 506(c)</h2>
+  <div class="w3-container">
+    <a href="index.html" class="w3-button w3-block w3-black">Back</a>
+    <br/>
+    <button class="w3-button w3-block w3-black" id="refresh">Refresh</button>
+    <br/>
+    <div class="w3-panel">
+      <fieldset>
+        <legend>Token</legend>
+        <label for="name">Name</label>
+        <input type="text" class="w3-input w3-block w3-light-grey" name="name" id="name" value="" readonly />
+        <label for="symbol">Symbol</label>
+        <input type="text" class="w3-input w3-block w3-light-grey" name="symbol" id="symbol" value="" readonly />
+        <label for="total-supply">Total Supply</label>
+        <input type="number" steps="0" class="w3-input w3-block w3-light-grey" name="total-supply" id="total-supply" value="" readonly />
+        <label for="cusip">CUSIP</label>
+        <input type="text" class="w3-input w3-block w3-light-grey" name="cusip" id="cusip" value="" readonly />
+        <label for="outstanding">Outstanding Shares</label>
+        <input type="number" steps="0" class="w3-input w3-block w3-light-grey" name="outstanding" id="outstanding" value="" readonly />
+        <label for="available">Available Shares</label>
+        <input type="number" steps="0" class="w3-input w3-block w3-light-grey" name="available" id="available" value="" readonly />
+      </fieldset>
+      <fieldset>
+        <legend>Accounts</legend>
+        <label for="account">Accounts</label>
+        <select class="w3-input w3-block" name="account" id="account">
+          <option value="">Select</option>
+        </select>
+        <label for="stockholders">Accredited Stockholders</label>
+        <select class="w3-input w3-block" name="stockholders" id="stockholders">
+          <option value="">Select</option>
+        </select>
+        <label for="affiliate">Affiliate Stockholders</label>
+        <select class="w3-input w3-block" name="affiliate" id="affiliate">
+          <option value="">Select</option>
+        </select>
+        <label for="nonaccredited">Non-Accredited Stockholders</label>
+        <select class="w3-input w3-block" name="nonaccredited" id="nonaccredited">
+          <option value="">Select</option>
+        </select>
+        <label for="balance">Balance</label>
+        <input type="number" steps="0" class="w3-input w3-block w3-light-grey" name="balance" id="balance" value="" readonly />  
+      </fieldset>
+      <fieldset>
+        <legend>Actions</legend>
+        <label for="investment">Investment (in dollars)</label>
+        <input type="number" class="w3-input w3-block" steps="0" name="investment" id="investment" value="" min="1" max="10000" />
+        <br/>
+        <button class="w3-button w3-block w3-green" id="calculate">Calculate</button>
+        <br/>
+        <input type="text" class="w3-input w3-block w3-light-grey" steps="any" name="wei" id="wei" value="" readonly />
+      </fieldset>
+    </div>
+  </div>
+  <div id="message"></div>
+  <script>
+    const contractAddress = localStorage.getItem('contract-address');
+   
+    var contract, contractInstance;
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(localStorage.getItem('blockchain')));
+
+    web3.eth.getBlockNumber(function (error, result) {
+      console.log(result);
+    });
+
+
+
+    async function init() {
+      try {
+        //document.getElementById('total-supply').value = await this.contract.methods.totalSupply().call();
+        //contract.methods.name().call((err, result) => { console.log(result) });
+        //contract.methods.totalSupply().call((err, result) => { console.log(result) });
+        //contract.methods.holderCount().call((err, result) => { console.log(result) });
+
+      } catch(error) {
+        console.log(error);
+      }
+
+    }
+
+    window.onload = async function() {
+      //contract = new web3.eth.Contract(abi, contractAddress);
+      web3.eth.getAccounts(function(error, accounts){
+        console.log(accounts);
+        accounts.forEach(function(account){
+          var option = new Option(account);
+          document.getElementById('account').add(option);
+        });
+
+      });      
+      console.log(web3.eth);
+
+      contract = new web3.eth.Contract(abi, contractAddress);
+
+
+
+    }
+
+    function totalSupply() {
+      const totalSupply = contract.methods.totalSupply().send({from: contractAddress},function(error, result){
+        console.log([error,result]);
+      });
+      console.log(totalSupply);
+    }
+
+    document.getElementById('account').addEventListener('change', function(e){
+      web3.eth.getBalance(this.value, function(error, balance){
+        document.getElementById('balance').value = balance;
+      });
+    });
+
+    function GetAccountBalance(address, callback) {
+      web3.eth.getBalance(address, function(error, balance){
+        return balance;
+      });
+    }
+
+    document.getElementById("calculate").addEventListener("click", function(e){
+      this.setAttribute('disabled','disabled');
+      var wei = Web3.utils.toBN(this.value);
+      document.getElementById("wei").value = wei.toString();
+      this.removeAttribute('disabled');
+    });
+
+  </script>  
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "name": "admin-exempt-offering",
+  "version": "1.0.0",
+  "description": "Administrator access for managing blockchain tokens for an exempt offering",
+  "main": "index.js",
+  "build": {
+    "appId": "work.pingleware.adminexemptoffering",
+    "productName": "ExemptOffering-Administrator",
+    "copyright": "Copyright © 2021 ${author}",
+    "win": {
+        "icon": "../assets/stockcertificate.png"
+    },
+    "linux": {
+        "target": "deb",
+        "icon": "../assets/stockcertificate.png",
+        "category": "Finance"
+    },
+    "files": [],
+    "extraFiles": []
+},
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": [
+    "sec",
+    "exempt_offering"
+  ],
+  "author": {
+    "name": "PressPage Entertainment Inc"
+  },
+  "maintainers": [
+    {
+      "name": "PressPage Entertainment Inc DBA PINGLEWARE"
+    },
+    {
+      "name": "Patrick O. Ingle"
+    }
+  ],
+  "license": "CC-BY-4.0",
+  "devDependencies": {
+    "cross-var": "^1.1.0",
+    "electron": "^8.2.3",
+    "electron-builder": "^22.13.1"
+  },
+  "dependencies": {
+    "path": "^0.12.7",
+    "@presspage/common-js": "^1.4.0",
+    "web3": "^1.6.1",
+    "web3-utils": "^1.6.1"
+  }
+}

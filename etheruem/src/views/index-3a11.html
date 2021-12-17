@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Exempt Equity Token Rule 3(a)(11)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js" integrity="sha256-nWBTbvxhJgjslRyuAKJHK+XcZPlCnmIAAMixz6EefVk=" crossorigin="anonymous"></script>
+  <script language="javascript" type="text/javascript" src="./abi-3a11.js"></script>
+  <script>
+    // this will be where our code will be
+  </script>
+</head>
+<body>
+  <br/>
+  <div class="w3-container">
+    <a href="index.html" class="w3-button w3-block w3-black">Back</a>
+    <br/>
+    <button class="w3-button w3-block w3-black" id="refresh">Refresh</button>
+    <br/>
+  </div>
+  <div id="message"></div>
+  <script>
+    const contractAddress = localStorage.getItem('contract-address');
+    var contract;
+
+    var totalSupply = async() => { return await contract.methods.totalSupply().call(); }
+
+    window.addEventListener('load', async () => {
+  
+  
+      const contractMessage = async () => {
+        let message = await contract.methods.getMessage().call();
+        return message;
+      }
+
+  
+      // Modern dapp browsers...
+      if (window.ethereum) {
+        window.web3 = new Web3(ethereum);
+        try {
+          // Request account access if needed
+          await ethereum.enable();
+          contract = new web3.eth.Contract(abi, contractAddress);
+        } catch (error) {
+          // User denied account access...
+        }
+      }
+      // Non-dapp browsers...
+      else {
+        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+      }
+    });
+
+    document.getElementById('refresh').addEventListener('click', function(e){
+      e.preventDefault();
+      console.log(contract);
+    });
+  </script>  
+</body>
+</html>

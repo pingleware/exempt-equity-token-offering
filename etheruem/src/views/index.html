@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Exempt Equity Tokens</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    </head>
+    <body>
+        <h2 class="w3-green">Exempt Equity Smart Contract Integration</h2>
+        <div class="w3-panel">
+            <p>Steps:</p>
+            <ol>
+                <li>Install truffle, gnache-cli, and live-server globally. [npm i -g truffle gnache-cli live-server]</li>
+                <li>Open a command/terminal session and start gnache-cli [gnache-cli]</li>
+                <li>Edit truffle-config.js and configure the development setting for networks [host=127.0.0.1, port=8545, network_id=*]</li>
+                <li>Open a second command/terminal session and start truffle [truffle migrate -network development]</li>
+                <li>After contracts have been deployed, change to src path in the truffle session and start live-server [cd src && live-server]</li>
+                <li>Copy the contract address from the ganache-cli or truffle session and paste in the field in the browser session</li>
+                <li>Choose the contrat to interact</li>
+            </ol>
+        </div>
+        <div class=class="w3-container">
+            <label for="blockchain">Blockchain URL</label>
+            <input type="url" class="w3-input w3-block w3-pale-yellow" name="blockchain" id="blockchain" value="" /><br/>
+            <label for="contract-address">Contract Address</label>
+            <input type="text" class="w3-input w3-block w3-pale-yellow" name="contract-address" id="contract-address" value="" /><br/>
+            <a href="index-cf.html" class="w3-button w3-block w3-blue">Regulation Crowd Funding</a><br/>
+            <a href="index-3a11.html" class="w3-button w3-block w3-blue">Rule 3(a)(11)</a><br/>
+            <a href="index-4a2.html" class="w3-button w3-block w3-blue">Rule 4(a)(2)</a><br/>
+            <a href="index-147.html" class="w3-button w3-block w3-blue">Rule 147</a><br/>
+            <a href="index-504.html" class="w3-button w3-block w3-blue">Rule 504</a><br/>
+            <a href="index-505.html" class="w3-button w3-block w3-blue">Rule 505</a><br/>
+            <a href="index-506b.html" class="w3-button w3-block w3-blue">Private Equity - Rule 506(b)</a><br/>
+            <a href="index-506c.html" class="w3-button w3-block w3-blue">General Solicitation - Rule 506(c)</a><br/>
+            <a href="index-at1.html" class="w3-button w3-block w3-blue">Regulation A - Tier 1</a><br/>
+            <a href="index-at2.html" class="w3-button w3-block w3-blue">Regulation A - Tier 2</a><br/>
+        </div>
+        <script>
+            window.onload = function() {
+                document.getElementById('contract-address').value = localStorage.getItem('contract-address');
+                document.getElementById('blockchain').value = localStorage.getItem('blockchain');
+            }
+            document.getElementById('contract-address').addEventListener('change',function(e){
+                localStorage.setItem('contract-address',this.value);
+            });
+            document.getElementById('blockchain').addEventListener('change',function(e){
+                localStorage.setItem('blockchain',this.value);
+            });
+        </script>
+    </body>
+</html>

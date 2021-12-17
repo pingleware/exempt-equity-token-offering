@@ -51,3 +51,6 @@ the new meaning,
     Series 10 - under the rules of Regulation 10-12/G|B
 
 the new definition permits any order of funding based on the SEC regulation?
+
+# Project Structure
+This project is being built for both ethereum and solana blockchains, where the source code resides in the respective directories
